@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class GameBoard {
 	private int[][] rowsCols;
+	private boolean p1pop = false;
+	private boolean p2pop = false;
 	
 	GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
@@ -15,6 +17,11 @@ public class GameBoard {
 	
 	public void applyMove(int player, int col, int movetype){
 		if (movetype == 0){//pop
+			if(player == 1){
+				p1pop = true;
+			} else {
+				p2pop = true;
+			}
 			//rowsCols[rowsCols.length - 1][col] = 0;
 			for(int i = rowsCols.length - 1; i > 0; i--){
 				rowsCols[i][col] = rowsCols[i - 1][col];
@@ -22,6 +29,25 @@ public class GameBoard {
 			rowsCols[0][col] = 0;
 		} else {//drop
 			rowsCols[nextOpenRow(col)][col] = player;
+		}
+	}
+	
+	public boolean isMoveValid(int player, int col, int movetype){
+		if (movetype == 0){//pop
+			if(player == 1 && p1pop){
+				return false;
+			} 
+			if (player == 2 && p2pop) {
+				return false;
+			}
+			return rowsCols[rowsCols.length - 1][col] == player;
+			
+		} else {//drop
+			if(nextOpenRow(col) < 0){
+				return false;
+			} else {
+				return true;
+			}
 		}
 	}
 	

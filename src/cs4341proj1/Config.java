@@ -6,13 +6,15 @@ public class Config {
 	private int numWin;
 	private int playernum;
 	private int turnlen;
+	private int firstplayer;
 	
-	Config(int numRows, int numCol, int numWin, int playernum, int turnlen){
+	Config(int numRows, int numCol, int numWin, int playernum, int turnlen, int firstplayer){
 		this.numRows = numRows;
 		this.numCol	= numCol;
 		this.numWin = numWin;
 		this.playernum = playernum;
 		this.turnlen = turnlen;
+		this.firstplayer = firstplayer;
 	}
 
 	/**
@@ -48,6 +50,13 @@ public class Config {
 	 */
 	public int getTurnlen() {
 		return turnlen;
+	}
+
+	/**
+	 * @return the firstplayer
+	 */
+	public int getFirstplayer() {
+		return firstplayer;
 	}
 
 }
