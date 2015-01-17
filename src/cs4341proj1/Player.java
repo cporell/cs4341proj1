@@ -8,6 +8,7 @@ public class Player {
 	static boolean first = false;
 	static boolean firstplayed = false;
 	static boolean playing = true;
+	static GameBoard board;
 
 	public static void main(String[] args) {
 		
@@ -19,6 +20,8 @@ public class Player {
 		if (conf.getPlayernum() == 1){
 			first = true;
 		}
+		board = new GameBoard(conf.getNumRows(), conf.getNumCol());
+		System.err.println(board);
 		
 		while(playing){
 			if(first && !firstplayed){
@@ -34,8 +37,13 @@ public class Player {
 	}
 	
 	private static void readMove() {
-		// TODO Auto-generated method stub
-		
+		String move = in.nextLine();
+		String[] moveparts = move.split(" ");
+		if (moveparts.length == 2){
+			board.applyMove(2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
+		} else {
+			playing = false;
+		}
 	}
 
 	private static void writeMove() {
