@@ -8,13 +8,24 @@ public class Config {
 	private int turnlen;
 	private int firstplayer;
 	
-	Config(int numRows, int numCol, int numWin, int playernum, int turnlen, int firstplayer){
+	private static Config instance = null;
+	
+	private Config(int numRows, int numCol, int numWin, int playernum, int turnlen, int firstplayer){
 		this.numRows = numRows;
 		this.numCol	= numCol;
 		this.numWin = numWin;
 		this.playernum = playernum;
 		this.turnlen = turnlen;
 		this.firstplayer = firstplayer;
+	}
+	
+	public static Config getInstance(int numRows, int numCol, int numWin, int playernum, int turnlen, int firstplayer){
+		instance = new Config(numRows, numCol, numWin, playernum, turnlen, firstplayer);
+		return instance;
+	}
+	
+	public static Config getInstance(){
+		return instance;
 	}
 
 	/**

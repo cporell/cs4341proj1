@@ -6,6 +6,7 @@ public class GameBoard {
 	protected int[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
+	protected MoveTree[] submoves;
 	
 	GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
@@ -72,7 +73,7 @@ public class GameBoard {
 		return result;
 	}
 	
-	public MoveTree[] genPossibleMoves(int player){
+	public void genPossibleMoves(int player){
 		MoveTree[] result = new MoveTree[rowsCols[0].length * 2];
 		int n = 0;
 		for (int i = 0; i < 2 ;i++){
@@ -81,6 +82,6 @@ public class GameBoard {
 				n++;
 			}
 		}
-		return result;
+		this.submoves = result;
 	}
 }

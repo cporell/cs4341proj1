@@ -106,7 +106,7 @@ public class Player {
 		
 		String configs = in.nextLine();
 		parts = configs.split(" ");
-		conf = new Config(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 
+		conf = Config.getInstance(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 
 				Integer.parseInt(parts[2]), playernum, Integer.parseInt(parts[4]), 
 				Integer.parseInt(parts[3]) - 1);
 		//log.print("readConfig done");
