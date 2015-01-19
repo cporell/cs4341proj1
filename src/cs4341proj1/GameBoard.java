@@ -3,9 +3,9 @@ package cs4341proj1;
 import java.util.Arrays;
 
 public class GameBoard {
-	private int[][] rowsCols;
-	private boolean p1pop = false;
-	private boolean p2pop = false;
+	protected int[][] rowsCols;
+	protected boolean p1pop = false;
+	protected boolean p2pop = false;
 	
 	GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
@@ -51,7 +51,7 @@ public class GameBoard {
 		}
 	}
 	
-	private int nextOpenRow(int col){
+	protected int nextOpenRow(int col){
 		for (int i = 0; i < rowsCols.length; i++){
 			if(rowsCols[i][col] != 0){
 				return i - 1;
@@ -68,6 +68,18 @@ public class GameBoard {
 				result += rowsCols[i][j] + "";
 			}
 			result += "\n";
+		}
+		return result;
+	}
+	
+	public MoveTree[] genPossibleMoves(int player){
+		MoveTree[] result = new MoveTree[rowsCols[0].length * 2];
+		int n = 0;
+		for (int i = 0; i < 2 ;i++){
+			for (int j = 0; j < rowsCols[0].length; j++){
+				result[n] = new MoveTree(this, player, j, i);
+				n++;
+			}
 		}
 		return result;
 	}
