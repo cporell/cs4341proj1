@@ -113,10 +113,15 @@ public class GameBoard {
 	 * Returns an array holding two ints: the column to move in, and the move type
 	 */
 	public int minimax() {
-		int value = 0;
+		int maxValue = 0;
 		
-		// Search through the moveTrees and to find the 
+		// Search through the moveTrees and to find the highest value of all the minimaxes.
+		for(MoveTree children : this.submoves) {
+			if(children.minimax() > maxValue){
+				maxValue = children.minimax();
+			}
+		}
 		
-		return value;
+		return maxValue;
 	}
 }
