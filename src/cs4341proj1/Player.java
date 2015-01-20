@@ -40,7 +40,7 @@ public class Player {
 		}
 		
 		log.print("generating game board");
-		board = new GameBoard(conf.getNumRows(), conf.getNumCol());
+		board = GameBoard.getInstance();
 		//System.err.println(board);
 		
 		while(playing){

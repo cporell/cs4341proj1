@@ -3,18 +3,27 @@ package cs4341proj1;
 import java.util.Arrays;
 
 public class GameBoard {
+	private static GameBoard instance = null;
 	protected int[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
 	protected MoveTree[] submoves = null;
 	private int plyscalculated = 0;
 	
-	GameBoard(int numRows, int numCols){
+	protected GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
 		for (int i = 0; i < numRows; i++){
 			Arrays.fill(rowsCols[i], 0);
 		}
 		
+	}
+	
+	public static GameBoard getInstance(){
+		if (instance == null){
+			instance = new GameBoard(Config.getInstance().getNumRows(),
+					Config.getInstance().getNumCol()); 
+		}
+		return instance;
 	}
 	
 	public void applyMove(int player, int col, int movetype){
