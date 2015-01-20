@@ -2,10 +2,10 @@ package cs4341proj1;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+//import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+//import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,7 +26,8 @@ public class Player {
 		if (args.length > 1){
 			name = args[1];
 		}
-		log = new Logger(args[0]);
+		Logger.init(args[0]);
+		log = Logger.getInstance();
 		log.print("started!!!!!");
 		// TODO Auto-generated method stub
 		//System.out.println("Test");
@@ -67,7 +68,7 @@ public class Player {
 		String move = in.nextLine();
 		String[] moveparts = move.split(" ");
 		if (moveparts.length == 2){
-			board.applyMove(2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
+			board.applyMove((short)2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
 		} else {
 			playing = false;
 		}
@@ -80,19 +81,19 @@ public class Player {
 		exec.execute(f);
 		
 		try {
-			//f.get(conf.getTurnlen(), TimeUnit.SECONDS);
-			f.get();
+			f.get(conf.getTurnlen() - 2, TimeUnit.SECONDS);
+			//f.get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}/* catch (TimeoutException e) {
+		} catch (TimeoutException e) {
 			// TODO Auto-generated catch block
-			f.cancel();
+			f.cancel(true);
 			e.printStackTrace();
-		}*/
+		}
 		/*
 		Random rand = new Random();
 		int col = rand.nextInt(conf.getNumCol());
@@ -106,7 +107,7 @@ public class Player {
 		*/
 		log.print(board.toString());
 		int[] bestmove = board.getBestMove();
-		board.applyMove(1, bestmove[0], bestmove[1]);
+		board.applyMove((short)1, bestmove[0], bestmove[1]);
 		System.out.println(bestmove[0] + " " + bestmove[1]);
 		log.print(bestmove[0] + " " + bestmove[1]);
 		

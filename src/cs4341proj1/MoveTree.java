@@ -1,5 +1,7 @@
 package cs4341proj1;
 
+import java.util.Arrays;
+
 public class MoveTree extends GameBoard {
 	
 	private boolean isvalid;
@@ -7,10 +9,14 @@ public class MoveTree extends GameBoard {
 	private int moveValue = Integer.MIN_VALUE;
 	private int col;
 	private int moveType;
+	private boolean terminal = false;
 	
 	MoveTree(GameBoard current, int player, int col, int movetype) {
 		super(current.rowsCols.length, current.rowsCols[0].length);
-		this.rowsCols = current.rowsCols;
+		for (int i = 0; i < rowsCols.length; i++){
+			this.rowsCols[i] = Arrays.copyOf(current.rowsCols[i], current.rowsCols[i].length);
+		}
+		//this.rowsCols = Arrays.copyOf(current.rowsCols, current.rowsCols.length);
 		this.p1pop = current.p1pop;
 		this.p2pop = current.p2pop;
 		this.player = player;
@@ -19,11 +25,15 @@ public class MoveTree extends GameBoard {
 		
 		this.isvalid = this.isMoveValid(player, col, movetype);
 		
-		if (this.isvalid){
-			this.applyMove(player, col, movetype);
+		this.init();
+		
+	}
+	
+	private void init(){
+		if (this.isvalid && !this.terminal){
+			this.applyMove((short)player, col, moveType);
 			this.evalMove();
 		}
-		
 	}
 	
 	public boolean getIsValid(){
@@ -35,17 +45,20 @@ public class MoveTree extends GameBoard {
 	}
 	
 	public void genPossibleMoves(){
-		if (this.player == 1){
-			this.genPossibleMoves(2);
-		} else {
-			this.genPossibleMoves(1);
+		if (this.isvalid){
+			if (this.player == 1){
+				this.genPossibleMoves(2);
+			} else {
+				this.genPossibleMoves(1);
+			}
 		}
+		this.rowsCols = null;
 	}
 	
 	public void evalMove(){
 		boolean winning = isNConnected(1);
 		boolean losing = isNConnected(2);
-		
+		this.terminal = winning || losing;
 		if(winning && losing){
 			this.moveValue = -100;
 		} else if (winning){
@@ -136,6 +149,9 @@ public class MoveTree extends GameBoard {
 			this.genPossibleMoves(1);
 		} else {
 			for(int i = 0; i < submoves.length; i++){
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
 				submoves[i].calculatePly(depth - 1);
 			}
 		}
@@ -156,18 +172,24 @@ public class MoveTree extends GameBoard {
 		//miniVal[0] = this.col;			// Store the column the action will take place in
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
 		
-		if(this.submoves == null) {
+		if(this.submoves == null || this.terminal) {
 			return lowestVal;
 		}
 		
 		// If we got here, then this leaf has children.
 		// Search those children for the one with the lowest value, and return its column and move
 		for(MoveTree children: this.submoves) {
+			if (Thread.currentThread().isInterrupted()){
+				return lowestVal;
+			}
 			if (children.isvalid){
 				int childMin = children.minimax(0);
 				if(childMin < lowestVal) {
 					lowestVal = childMin;
 				}
+			}
+			if (Thread.currentThread().isInterrupted()){
+				return lowestVal;
 			}
 		}
 		

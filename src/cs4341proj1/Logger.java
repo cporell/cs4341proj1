@@ -6,8 +6,9 @@ import java.io.UnsupportedEncodingException;
 
 public class Logger {
 	PrintWriter writer;
+	private static Logger instance;
 	
-	Logger(String logfile){
+	private Logger(String logfile){
 		try {
 			this.writer = new PrintWriter(logfile, "UTF-8");
 		} catch (FileNotFoundException e) {
@@ -18,6 +19,14 @@ public class Logger {
 			e.printStackTrace();
 		};
 		
+	}
+	
+	public static void init(String logfile){
+		instance = new Logger(logfile);
+	}
+	
+	public static Logger getInstance(){
+		return instance;
 	}
 	
 	public void print(String s){

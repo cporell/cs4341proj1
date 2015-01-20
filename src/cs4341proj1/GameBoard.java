@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class GameBoard {
 	private static GameBoard instance = null;
-	protected int[][] rowsCols;
+	protected short[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
 	protected MoveTree[] submoves = null;
@@ -12,9 +12,9 @@ public class GameBoard {
 	private int[] bestmove = new int[2];
 	
 	protected GameBoard(int numRows, int numCols){
-		rowsCols = new int[numRows][numCols];
+		rowsCols = new short[numRows][numCols];
 		for (int i = 0; i < numRows; i++){
-			Arrays.fill(rowsCols[i], 0);
+			Arrays.fill(rowsCols[i], (short)0);
 		}
 		
 	}
@@ -27,7 +27,7 @@ public class GameBoard {
 		return instance;
 	}
 	
-	public void applyMove(int player, int col, int movetype){
+	public void applyMove(short player, int col, int movetype){
 		if (movetype == 0){//pop
 			if(player == 1){
 				p1pop = true;
@@ -96,8 +96,12 @@ public class GameBoard {
 	public void genPossibleMoves(int player){
 		MoveTree[] result = new MoveTree[rowsCols[0].length * 2];
 		int n = 0;
-		for (int i = 0; i < 2 ;i++){
+		for (int i = 0; i < 2; i++){
 			for (int j = 0; j < rowsCols[0].length; j++){
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
+				//Logger.getInstance().print(this.toString());
 				result[n] = new MoveTree(this, player, j, i);
 				n++;
 			}
@@ -111,10 +115,14 @@ public class GameBoard {
 			this.genPossibleMoves(1);
 		} else {
 			for(int i = 0; i < submoves.length; i++){
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
 				submoves[i].calculatePly(this.plyscalculated - 1);
 			}
 		}
 		plyscalculated++;
+		Logger.getInstance().print(plyscalculated + " plys calculated");
 	}
 	
 	public int[] getBestMove(){
@@ -135,7 +143,13 @@ public class GameBoard {
 		
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
 		for(int i = 0; i < this.submoves.length; i++) {
+			if (Thread.currentThread().isInterrupted()){
+				return;
+			}
 			int tempminimax = this.submoves[i].minimax(0);
+			if (Thread.currentThread().isInterrupted()){
+				return;
+			}
 			if(tempminimax > maxValue){
 				maxValue = tempminimax;
 				maxValueIndex = i;
