@@ -6,6 +6,7 @@ public class RunMinimax implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		GameBoard board = GameBoard.getInstance();
+		board.minimax();
 		for(int i = 0; i < 5; i++){
 			board.calculatePly();
 			board.minimax();

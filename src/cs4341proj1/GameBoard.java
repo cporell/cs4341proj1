@@ -9,6 +9,7 @@ public class GameBoard {
 	protected boolean p2pop = false;
 	protected MoveTree[] submoves = null;
 	private int plyscalculated = 0;
+	private int[] bestmove = new int[2];
 	
 	protected GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
@@ -107,21 +108,38 @@ public class GameBoard {
 		plyscalculated++;
 	}
 	
+	public int[] getBestMove(){
+		return this.bestmove;
+	}
+	
 	/**
 	 * Function to search for the best possible move via minimax
 	 * Gathers all the minimax values of its movetrees, then chooses the maximum value and returns it.
 	 * Returns an array holding two ints: the column to move in, and the move type
 	 */
-	public int minimax() {
-		int maxValue = 0;
+	public void minimax() {
+		if (this.submoves == null){
+			return;
+		}
+		int maxValue = Integer.MIN_VALUE;
+		int maxValueIndex = 0;
 		
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
-		for(MoveTree children : this.submoves) {
-			if(children.minimax() > maxValue){
-				maxValue = children.minimax();
+		for(int i = 0; i < this.submoves.length; i++) {
+			int tempminimax = this.submoves[i].minimax(0);
+			if(tempminimax > maxValue){
+				maxValue = tempminimax;
+				maxValueIndex = i;
 			}
 		}
 		
-		return maxValue;
+		if (maxValueIndex - rowsCols[0].length < 0){
+			this.bestmove[0] = maxValueIndex;
+			this.bestmove[1] = 0;
+		} else {
+			this.bestmove[0] = maxValueIndex - rowsCols[0].length;
+			this.bestmove[1] = 1;
+		}
+		
 	}
 }

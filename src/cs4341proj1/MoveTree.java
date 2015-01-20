@@ -140,8 +140,7 @@ public class MoveTree extends GameBoard {
 	 * If this is a leaf move (has no child nodes), return the value for this leaf
 	 * Else, returns the move with the lowest value among its children leaves 
 	 */
-	@Override
-	public int minimax() {
+	public int minimax(int currentmin) {
 		//int[] miniVal = new int[2];
 		
 		// Stores the value of the move with the lowest value
