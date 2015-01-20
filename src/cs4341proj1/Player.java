@@ -68,7 +68,7 @@ public class Player {
 		String move = in.nextLine();
 		String[] moveparts = move.split(" ");
 		if (moveparts.length == 2){
-			board.applyMove((short)2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
+			board.applyMove((byte)2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
 		} else {
 			playing = false;
 		}
@@ -107,7 +107,7 @@ public class Player {
 		*/
 		log.print(board.toString());
 		int[] bestmove = board.getBestMove();
-		board.applyMove((short)1, bestmove[0], bestmove[1]);
+		board.applyMove((byte)1, bestmove[0], bestmove[1]);
 		System.out.println(bestmove[0] + " " + bestmove[1]);
 		log.print(bestmove[0] + " " + bestmove[1]);
 		

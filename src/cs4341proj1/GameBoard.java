@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class GameBoard {
 	private static GameBoard instance = null;
-	protected short[][] rowsCols;
+	protected byte[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
 	protected MoveTree[] submoves = null;
@@ -12,9 +12,9 @@ public class GameBoard {
 	private int[] bestmove = new int[2];
 	
 	protected GameBoard(int numRows, int numCols){
-		rowsCols = new short[numRows][numCols];
+		rowsCols = new byte[numRows][numCols];
 		for (int i = 0; i < numRows; i++){
-			Arrays.fill(rowsCols[i], (short)0);
+			Arrays.fill(rowsCols[i], (byte)0);
 		}
 		
 	}
@@ -27,7 +27,7 @@ public class GameBoard {
 		return instance;
 	}
 	
-	public void applyMove(short player, int col, int movetype){
+	public void applyMove(byte player, int col, int movetype){
 		if (movetype == 0){//pop
 			if(player == 1){
 				p1pop = true;

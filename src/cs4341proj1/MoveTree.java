@@ -31,7 +31,7 @@ public class MoveTree extends GameBoard {
 	
 	private void init(){
 		if (this.isvalid && !this.terminal){
-			this.applyMove((short)player, col, moveType);
+			this.applyMove((byte)player, col, moveType);
 			this.evalMove();
 		}
 	}
