@@ -156,7 +156,7 @@ public class MoveTree extends GameBoard {
 		// If we got here, then this leaf has children.
 		// Search those children for the one with the lowest value, and return its column and move
 		for(MoveTree children: this.submoves) {
-			int childMin = children.minimax();
+			int childMin = children.minimax(0);
 			if(childMin < lowestVal) {
 				lowestVal = childMin;
 			}
