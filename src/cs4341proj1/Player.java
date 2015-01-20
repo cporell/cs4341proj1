@@ -1,6 +1,14 @@
 package cs4341proj1;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 public class Player {
@@ -67,6 +75,25 @@ public class Player {
 
 	private static void writeMove() {
 		log.print(board.toString());
+		FutureTask<Void> f = new FutureTask<Void>(new RunMinimax(), null);
+		ExecutorService exec = Executors.newFixedThreadPool(1);
+		exec.execute(f);
+		
+		try {
+			//f.get(conf.getTurnlen(), TimeUnit.SECONDS);
+			f.get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}/* catch (TimeoutException e) {
+			// TODO Auto-generated catch block
+			f.cancel();
+			e.printStackTrace();
+		}*/
+		
 		Random rand = new Random();
 		int col = rand.nextInt(conf.getNumCol());
 		int movetype = rand.nextInt(2);
