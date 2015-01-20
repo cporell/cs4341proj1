@@ -42,6 +42,15 @@ public class GameBoard {
 		} else {//drop
 			rowsCols[nextOpenRow(col)][col] = player;
 		}
+		if (this.submoves != null){
+			//This next line replaces the gameboard's submove tree with that of the 
+			//  hypothetical move that matches the one that was just applied
+			//submoves is always ordered so that it contains a pop move (movetype == 0)
+			//  for each column in order then a drop move (movetype == 1) for each column in
+			//  order. That is why the math to determine the index works
+			this.submoves = this.submoves[col + (rowsCols[0].length * movetype)].submoves;
+			this.plyscalculated--;
+		}
 	}
 	
 	public boolean isMoveValid(int player, int col, int movetype){
