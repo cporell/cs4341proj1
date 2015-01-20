@@ -43,12 +43,19 @@ public class MoveTree extends GameBoard {
 	}
 	
 	public void evalMove(){
-		if (isNConnected(1)){
-			moveValue = Integer.MAX_VALUE;
+		boolean winning = isNConnected(1);
+		boolean losing = isNConnected(2);
+		
+		if(winning && losing){
+			this.moveValue = -100;
+		} else if (winning){
+			this.moveValue = 100;
+		} else if (losing) {
+			this.moveValue = -100;
+		} else {
+			this.moveValue = 0;
 		}
-		if (isNConnected(2)){
-			moveValue = Integer.MIN_VALUE;
-		}
+
 		
 	}
 	
@@ -156,9 +163,11 @@ public class MoveTree extends GameBoard {
 		// If we got here, then this leaf has children.
 		// Search those children for the one with the lowest value, and return its column and move
 		for(MoveTree children: this.submoves) {
-			int childMin = children.minimax(0);
-			if(childMin < lowestVal) {
-				lowestVal = childMin;
+			if (children.isvalid){
+				int childMin = children.minimax(0);
+				if(childMin < lowestVal) {
+					lowestVal = childMin;
+				}
 			}
 		}
 		
