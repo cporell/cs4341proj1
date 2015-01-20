@@ -6,7 +6,8 @@ public class GameBoard {
 	protected int[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
-	protected MoveTree[] submoves;
+	protected MoveTree[] submoves = null;
+	private int plyscalculated = 0;
 	
 	GameBoard(int numRows, int numCols){
 		rowsCols = new int[numRows][numCols];
@@ -83,5 +84,16 @@ public class GameBoard {
 			}
 		}
 		this.submoves = result;
+	}
+	
+	public void calculatePly(){
+		if (this.plyscalculated == 0){
+			this.genPossibleMoves(1);
+		} else {
+			for(int i = 0; i < submoves.length; i++){
+				submoves[i].calculatePly(this.plyscalculated - 1);
+			}
+		}
+		plyscalculated++;
 	}
 }

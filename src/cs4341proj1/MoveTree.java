@@ -119,5 +119,13 @@ public class MoveTree extends GameBoard {
 		return false;
 	}
 	
-
+	public void calculatePly(int depth){
+		if (depth == 0){
+			this.genPossibleMoves(1);
+		} else {
+			for(int i = 0; i < submoves.length; i++){
+				submoves[i].calculatePly(depth - 1);
+			}
+		}
+	}
 }
