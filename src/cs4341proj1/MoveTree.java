@@ -6,7 +6,7 @@ public class MoveTree extends GameBoard {
 	private int player;
 	private int moveValue = Integer.MIN_VALUE;
 	private int col;
-	
+	private int moveType;
 	
 	MoveTree(GameBoard current, int player, int col, int movetype) {
 		super(current.rowsCols.length, current.rowsCols[0].length);
@@ -15,6 +15,7 @@ public class MoveTree extends GameBoard {
 		this.p2pop = current.p2pop;
 		this.player = player;
 		this.col = col;
+		this.moveType = movetype;
 		
 		this.isvalid = this.isMoveValid(player, col, movetype);
 		
@@ -29,6 +30,9 @@ public class MoveTree extends GameBoard {
 		return this.isvalid;
 	}
 	
+	public int getMoveType(){
+		return this.moveType;
+	}
 	
 	public void genPossibleMoves(){
 		if (this.player == 1){
@@ -119,5 +123,31 @@ public class MoveTree extends GameBoard {
 		return false;
 	}
 	
-
+	/**
+	 * The child version of minimax.
+	 * Returns the minimum [col, move] for its branch
+	 * If this is a leaf move (has no child nodes), return the value for this leaf
+	 * Else, returns the move with the lowest value among its children leaves 
+	 */
+	@Override
+	public int minimax() {
+		//int[] miniVal = new int[2];
+		int lowestVal = this.moveValue;	// Stores the value of the move with the lowest value
+		//miniVal[0] = this.col;			// Store the column the action will take place in
+		//miniVal[1] = this.moveType;		// Store the move type that will be used
+		
+		if(this.submoves == null) {
+			return lowestVal;
+		}
+		
+		// If we got here, then this leaf has children.
+		// Search those children for the one with the lowest value, and return its column and move
+		for(MoveTree children: this.submoves) {
+			if(children.moveValue < lowestVal) {
+				lowestVal = children.moveValue;
+			}
+		}
+		
+		return lowestVal;
+	}
 }

@@ -84,4 +84,17 @@ public class GameBoard {
 		}
 		this.submoves = result;
 	}
+	
+	/**
+	 * Function to search for the best possible move via minimax
+	 * Gathers all the minimax values of its movetrees, then chooses the maximum value and returns it.
+	 * Returns an array holding two ints: the column to move in, and the move type
+	 */
+	public int minimax() {
+		int value = 0;
+		
+		// Search through the moveTrees and to find the 
+		
+		return value;
+	}
 }
