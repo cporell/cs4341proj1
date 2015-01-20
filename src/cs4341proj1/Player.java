@@ -93,7 +93,7 @@ public class Player {
 			f.cancel();
 			e.printStackTrace();
 		}*/
-		
+		/*
 		Random rand = new Random();
 		int col = rand.nextInt(conf.getNumCol());
 		int movetype = rand.nextInt(2);
@@ -103,10 +103,12 @@ public class Player {
 			movetype = rand.nextInt(2);
 			log.print(col + " " + movetype);
 		}
+		*/
 		log.print(board.toString());
-		board.applyMove(1, col, movetype);
-		System.out.println(col + " " + movetype);
-		log.print(col + " " + movetype);
+		int[] bestmove = board.getBestMove();
+		board.applyMove(1, bestmove[0], bestmove[1]);
+		System.out.println(bestmove[0] + " " + bestmove[1]);
+		log.print(bestmove[0] + " " + bestmove[1]);
 		
 	}
 
