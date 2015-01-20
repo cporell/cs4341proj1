@@ -125,14 +125,17 @@ public class MoveTree extends GameBoard {
 	
 	/**
 	 * The child version of minimax.
-	 * Returns the minimum [col, move] for its branch
+	 * Returns the minimum move value for its branch
 	 * If this is a leaf move (has no child nodes), return the value for this leaf
 	 * Else, returns the move with the lowest value among its children leaves 
 	 */
 	@Override
 	public int minimax() {
 		//int[] miniVal = new int[2];
-		int lowestVal = this.moveValue;	// Stores the value of the move with the lowest value
+		
+		// Stores the value of the move with the lowest value
+		int lowestVal = this.moveValue;	
+		
 		//miniVal[0] = this.col;			// Store the column the action will take place in
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
 		
