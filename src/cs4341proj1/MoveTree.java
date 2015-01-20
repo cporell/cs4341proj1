@@ -24,6 +24,8 @@ public class MoveTree extends GameBoard {
 		this.moveType = movetype;
 		
 		this.isvalid = this.isMoveValid(player, col, movetype);
+		//Logger.getInstance().print("Valid: " + this.isvalid + " player" + player
+		//		+ " col: " + col + " movetype: " + movetype);
 		
 		this.init();
 		
@@ -45,14 +47,19 @@ public class MoveTree extends GameBoard {
 	}
 	
 	public void genPossibleMoves(){
+		//Logger.getInstance().print("genPossibleMoves(): Valid: " + this.isvalid);
 		if (this.isvalid){
+			//Logger.getInstance().print("genPossibleMoves(): Valid: " + this.isvalid);
 			if (this.player == 1){
 				this.genPossibleMoves(2);
 			} else {
 				this.genPossibleMoves(1);
 			}
+			if(this.submoves == null){
+				Logger.getInstance().print("WTF!?!?");
+			}
 		}
-		this.rowsCols = null;
+		//this.rowsCols = null;
 	}
 	
 	public void evalMove(){
@@ -145,8 +152,10 @@ public class MoveTree extends GameBoard {
 	
 
 	public void calculatePly(int depth){
-		if (depth == 0){
-			this.genPossibleMoves(1);
+		if (depth == 0 && this.isvalid){
+			this.genPossibleMoves();
+		} else if(!this.isvalid) {
+			//Logger.getInstance().print("Skipping invalid move");
 		} else {
 			for(int i = 0; i < submoves.length; i++){
 				if (Thread.currentThread().isInterrupted()){
@@ -194,5 +203,15 @@ public class MoveTree extends GameBoard {
 		}
 		
 		return lowestVal;
+	}
+	
+	public void nullifyRowsCols(int depth){
+		if (depth == 0){
+			this.rowsCols = null;
+		} else if (this.submoves != null){
+			for(int i = 0; i < submoves.length; i++){
+				submoves[i].nullifyRowsCols(depth - 1);
+			}
+		}
 	}
 }

@@ -50,6 +50,9 @@ public class GameBoard {
 			//  order. That is why the math to determine the index works
 			this.submoves = this.submoves[col + (rowsCols[0].length * movetype)].submoves;
 			this.plyscalculated--;
+			if (this.submoves == null){
+				this.plyscalculated = 0;
+			}
 		}
 	}
 	
@@ -94,6 +97,7 @@ public class GameBoard {
 	}
 	
 	public void genPossibleMoves(int player){
+		//Logger.getInstance().print("Called From" + (this instanceof MoveTree));
 		MoveTree[] result = new MoveTree[rowsCols[0].length * 2];
 		int n = 0;
 		for (int i = 0; i < 2; i++){
@@ -101,9 +105,12 @@ public class GameBoard {
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
-				//Logger.getInstance().print(this.toString());
+				//Logger.getInstance().print("Making a movetree");
 				result[n] = new MoveTree(this, player, j, i);
 				n++;
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
 			}
 		}
 		this.submoves = result;
@@ -118,10 +125,21 @@ public class GameBoard {
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
-				submoves[i].calculatePly(this.plyscalculated - 1);
+				if(submoves[i].getIsValid()){
+					submoves[i].calculatePly(this.plyscalculated - 1);
+				}
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
 			}
 		}
+		
 		plyscalculated++;
+		
+		for(int i = 0; i < submoves.length; i++){
+			submoves[i].nullifyRowsCols(this.plyscalculated - 2);
+		}
+		
 		Logger.getInstance().print(plyscalculated + " plys calculated");
 	}
 	

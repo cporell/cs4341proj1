@@ -85,14 +85,15 @@ public class Player {
 			//f.get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (TimeoutException e) {
 			// TODO Auto-generated catch block
+			log.print("Cancelling thread");
 			f.cancel(true);
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		/*
 		Random rand = new Random();
