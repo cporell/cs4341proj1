@@ -13,13 +13,15 @@ public class RunMinimax implements Runnable {
 			//log.print(board.toString());
 			while(!Thread.currentThread().isInterrupted()){
 				//log.print("About to calculate Ply");
-				board.calculatePly();
+				boolean stuffchanged = board.calculatePly();
 				//log.print(board.toString());
 				//log.print("About to minimax");
 				if (Thread.currentThread().isInterrupted()){
 					break;
 				}
-				board.minimax();
+				if(stuffchanged){
+					board.minimax();
+				}
 				//log.print(board.toString());
 			}
 

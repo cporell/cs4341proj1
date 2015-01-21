@@ -59,6 +59,8 @@ public class Player {
 						log.print("writing move");
 						writeMove();
 						//System.err.println(board);
+					} else {
+						log.print("End of game, skipping writemove");
 					}
 				}
 			} catch (Exception e){
@@ -71,8 +73,10 @@ public class Player {
 				playing = false;
 			}
 		}
+		log.print("About to quit");
 		//in.close();
 		log.close();
+		System.exit(0);
 	}
 	
 	private static void readMove() {

@@ -130,16 +130,16 @@ public class GameBoard {
 	}
 	
 
-	public void calculatePly(){
-		if (this.plyscalculated >= 10){
-			return;
+	public boolean calculatePly(){
+		if (this.plyscalculated >= 5){
+			return false;
 		}
 		if (this.plyscalculated == 0){
 			this.genPossibleMoves(1);
 		} else {
 			for(int i = 0; i < submoves.length; i++){
 				if (Thread.currentThread().isInterrupted()){
-					return;
+					return false;
 				}
 				if(submoves[i] != null){
 					if(submoves[i].getIsValid()){
@@ -147,9 +147,10 @@ public class GameBoard {
 					}
 				}
 				if (Thread.currentThread().isInterrupted()){
-					return;
+					return false;
 				}
 			}
+			
 		}
 		
 		plyscalculated++;
@@ -162,6 +163,7 @@ public class GameBoard {
 		}
 		
 		Logger.getInstance().print(plyscalculated + " plys calculated");
+		return true;
 	}
 	
 	public int[] getBestMove(){

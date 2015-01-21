@@ -298,7 +298,7 @@ public class MoveTree extends GameBoard {
 					}
 				}
 				if(beta <= alpha){
-					prune(i);
+					//prune(i);
 					return currentVal;
 				}
 				
@@ -323,7 +323,7 @@ public class MoveTree extends GameBoard {
 	
 	private void prune(int index){
 		for (int i = index + 1; i < this.submoves.length; i++){
-			this.submoves[i] = null;
+			//this.submoves[i] = null;
 		}
 		this.prunedlength = index + 1;
 	}
