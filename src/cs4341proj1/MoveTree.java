@@ -10,6 +10,7 @@ public class MoveTree extends GameBoard {
 	private int col;
 	private int moveType;
 	private boolean terminal = false;
+	private int prunedlength;
 	
 	MoveTree(GameBoard current, int player, int col, int movetype) {
 		super(current.rowsCols.length, current.rowsCols[0].length);
@@ -56,7 +57,9 @@ public class MoveTree extends GameBoard {
 				this.genPossibleMoves(1);
 			}
 			if(this.submoves == null){
-				Logger.getInstance().print("WTF!?!?");
+				Logger.getInstance().print("gen possible moves Canceled");
+			} else {
+				this.prunedlength = this.submoves.length;
 			}
 		}
 		//this.rowsCols = null;
@@ -157,7 +160,7 @@ public class MoveTree extends GameBoard {
 		} else if(!this.isvalid) {
 			//Logger.getInstance().print("Skipping invalid move");
 		} else {
-			for(int i = 0; i < submoves.length; i++){
+			for(int i = 0; i < this.prunedlength; i++){
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
@@ -172,46 +175,71 @@ public class MoveTree extends GameBoard {
 	 * If this is a leaf move (has no child nodes), return the value for this leaf
 	 * Else, returns the move with the lowest value among its children leaves 
 	 */
-	public int minimax(int currentmin) {
+	public int minimax(int alpha, int beta) {
 		//int[] miniVal = new int[2];
 		
 		// Stores the value of the move with the lowest value
-		int lowestVal = this.moveValue;	
+		int currentVal = this.moveValue;	
 		
 		//miniVal[0] = this.col;			// Store the column the action will take place in
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
 		
 		if(this.submoves == null || this.terminal) {
-			return lowestVal;
+			return currentVal;
 		}
 		
 		// If we got here, then this leaf has children.
 		// Search those children for the one with the lowest value, and return its column and move
-		for(MoveTree children: this.submoves) {
+		//for(MoveTree children: this.submoves) {
+		for(int i = 0; i < this.prunedlength; i++){	
 			if (Thread.currentThread().isInterrupted()){
-				return lowestVal;
+				return currentVal;
 			}
-			if (children.isvalid){
-				int childMin = children.minimax(0);
-				if(childMin < lowestVal) {
-					lowestVal = childMin;
+			if (this.submoves[i].isvalid){
+				int childVal = this.submoves[i].minimax(alpha, beta);
+				if (this.player == 1){
+					if(childVal < currentVal) {
+						currentVal = childVal;
+						if(childVal < beta){
+							beta = childVal;
+						}
+					}
+				} else {
+					if(childVal > currentVal) {
+						currentVal = childVal;
+						if(childVal < alpha){
+							alpha = childVal;
+						}
+					}
 				}
+				if(beta <= alpha){
+					prune(i);
+					return currentVal;
+				}
+				
 			}
 			if (Thread.currentThread().isInterrupted()){
-				return lowestVal;
+				return currentVal;
 			}
 		}
 		
-		return lowestVal;
+		return currentVal;
 	}
 	
 	public void nullifyRowsCols(int depth){
 		if (depth == 0){
 			this.rowsCols = null;
 		} else if (this.submoves != null){
-			for(int i = 0; i < submoves.length; i++){
+			for(int i = 0; i < this.prunedlength; i++){
 				submoves[i].nullifyRowsCols(depth - 1);
 			}
 		}
+	}
+	
+	private void prune(int index){
+		for (int i = index + 1; i < this.submoves.length; i++){
+			this.submoves[i] = null;
+		}
+		this.prunedlength = index + 1;
 	}
 }
