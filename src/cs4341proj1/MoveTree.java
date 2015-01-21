@@ -62,24 +62,92 @@ public class MoveTree extends GameBoard {
 		//this.rowsCols = null;
 	}
 	
+	/**
+	 * This is the heuristic evaluation for a move.
+	 * It assigns a points value based on the current state of the board.
+	 * This points value will eventually be assigned to this MoveTree's moveValue.
+	 */
 	public void evalMove(){
-		boolean winning = isNConnected(1);
-		boolean losing = isNConnected(2);
+		int N = Config.getInstance().getNumWin();	// Grab the 'N' we have to connect
+		int player1Points = 0;		// The amount of points the player's pieces give
+		int player2Points = 0;		// The amount of points the opponent's pieces give
+		int score = 0;				// The final score to evaluate a move
+		boolean winning = isNConnected(1, N) == N;
+		boolean losing = isNConnected(2, N) == N;
 		this.terminal = winning || losing;
 		if(winning && losing){
-			this.moveValue = -100;
+			// If the player's move will be a draw, set points value to low priority.
+			// Even though it is not technically a loss, it is not a win either,
+			// so we want to give it just above our lowest value.
+			this.moveValue = (-(10 * N) + 1);	// Make the 'draw' state just above the 'lose' state,
+												// so it doesn't pick losing over drawing
+			return;
 		} else if (winning){
-			this.moveValue = 100;
+			// If this is a winning move, we want to set the points value to our highest value.
+			this.moveValue = 10 * N;
+			return;
 		} else if (losing) {
-			this.moveValue = -100;
+			// This is a losing move, so return the least desirable score. 
+			this.moveValue = -(10 * N);
+			return;
 		} else {
-			this.moveValue = 0;
+			for(int i = 1; i < 3; i++) {	// Loop generates the move evaluation for player 1, then player 2
+				for(int j = 0; j < N; j++){	// Inner loop keeps track of number of pieces connected.
+					double result = 0;
+					int prelimScore = this.isNConnected(i, j);
+					// Determine score based on n-number of connected spots
+					result = this.judgePrelimScore(prelimScore);
+					if(i == 1) {	// player 1
+						player1Points += result;
+					}
+					else {			// i == 2, player 2
+						player2Points += result;
+					}
+				}
+			}
 		}
-
 		
+		if(this.player == 1){
+			score = player1Points - player2Points;	
+		}
+		else {	// else player == 2
+			score = player2Points - player1Points;
+		}
+		this.moveValue = score;
 	}
 	
-	private boolean isNConnected(int player){
+	/**
+	 * Judges the preliminary score given by isNConnected.
+	 * Awards a certain amount of points based on the number given, and the number of pieces needed to win. 
+	 */
+	public double judgePrelimScore(int prelimScore) {
+		double score = 0;
+		double NtoWin = (double) Config.getInstance().getNumWin();
+		if(prelimScore == NtoWin) {
+			score = Math.pow(10, NtoWin);
+		}
+		else if(prelimScore == NtoWin - 1) {
+			score = Math.pow(10, NtoWin-1);
+		}
+		else if(prelimScore == NtoWin - 2) {
+			score = Math.pow(10, NtoWin-2);
+		}
+		else if(prelimScore <= NtoWin - 3) {
+			score = Math.pow(10, NtoWin - prelimScore);
+		}
+		else {
+			score = 0;
+		}
+		return score;
+	}
+	
+	/**
+	 * I'm modifying this to return the number connected. Any calls to this will have a
+	 * check to see if it matches the "NtoWin" in Config. - Connor
+	 * @param player The player whose pieces we are looking up.
+	 * @return The number of pieces connected 
+	 */
+	private int isNConnected(int player, int numConnected){
 		int N = Config.getInstance().getNumWin();
 		int topleft = 0;
 		int topright = 0;
@@ -139,15 +207,32 @@ public class MoveTree extends GameBoard {
 						break;
 					}
 				}
-				if(topleft + bottomright + 1 >= N
-						|| topright + bottomleft + 1 >= N
-						|| left + right + 1 >= N
-						|| bottom + 1 >= N){
-					return true;
+				if(topleft + bottomright + 1 >= numConnected
+						|| topright + bottomleft + 1 >= numConnected
+						|| left + right + 1 >= numConnected
+						|| bottom + 1 >= numConnected){
+					return numConnected;
 				}
 			}
 		}
-		return false;
+		int maxConnected = getMaxConnected(topleft + bottomright + 1, topright + bottomleft + 1,
+											left + right + 1, bottom + 1);
+		return maxConnected;
+	}
+	
+	/**
+	 * Gets a maximum value of the various directions from getNConnected
+	 * @param A series of values
+	 * @return The maximum number of those values
+	 */
+	public int getMaxConnected(int... values) {
+		int max = Integer.MIN_VALUE;
+		for(int i : values) {
+			if(i > max) {
+				max = i;
+			}
+		}
+		return max;
 	}
 	
 
