@@ -66,16 +66,18 @@ public class Player {
 	
 	private static void readMove() {
 		String move = in.nextLine();
+		log.print("read " + move);
 		String[] moveparts = move.split(" ");
 		if (moveparts.length == 2){
 			board.applyMove((byte)2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
 		} else {
 			playing = false;
 		}
+		log.print("Opponent's move applied");
 	}
 
 	private static void writeMove() {
-		log.print(board.toString());
+		//log.print(board.toString());
 		FutureTask<Void> f = new FutureTask<Void>(new RunMinimax(), null);
 		ExecutorService exec = Executors.newFixedThreadPool(1);
 		exec.execute(f);
@@ -106,11 +108,13 @@ public class Player {
 			log.print(col + " " + movetype);
 		}
 		*/
-		log.print(board.toString());
+		//log.print(board.toString());
 		int[] bestmove = board.getBestMove();
+		log.print("best move = " + bestmove[0] + " " + bestmove[1]);
 		board.applyMove((byte)1, bestmove[0], bestmove[1]);
 		System.out.println(bestmove[0] + " " + bestmove[1]);
-		log.print(bestmove[0] + " " + bestmove[1]);
+		log.print("best move printed");
+		//log.print(bestmove[0] + " " + bestmove[1]);
 		
 	}
 

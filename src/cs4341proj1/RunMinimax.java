@@ -10,17 +10,17 @@ public class RunMinimax implements Runnable {
 
 			log.print("About to minimax");
 			board.minimax();
-			log.print(board.toString());
+			//log.print(board.toString());
 			while(!Thread.currentThread().isInterrupted()){
-				log.print("About to calculate Ply");
+				//log.print("About to calculate Ply");
 				board.calculatePly();
-				log.print(board.toString());
-				log.print("About to minimax");
+				//log.print(board.toString());
+				//log.print("About to minimax");
 				if (Thread.currentThread().isInterrupted()){
 					break;
 				}
 				board.minimax();
-				log.print(board.toString());
+				//log.print(board.toString());
 			}
 
 		} catch (Exception e) {

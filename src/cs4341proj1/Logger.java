@@ -9,6 +9,7 @@ public class Logger {
 	private static Logger instance;
 	
 	private Logger(String logfile){
+		
 		try {
 			this.writer = new PrintWriter(logfile, "UTF-8");
 		} catch (FileNotFoundException e) {

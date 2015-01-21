@@ -42,18 +42,31 @@ public class GameBoard {
 		} else {//drop
 			rowsCols[nextOpenRow(col)][col] = player;
 		}
+		//Logger.getInstance().print("Move applied");
 		if (this.submoves != null){
 			//This next line replaces the gameboard's submove tree with that of the 
 			//  hypothetical move that matches the one that was just applied
 			//submoves is always ordered so that it contains a pop move (movetype == 0)
 			//  for each column in order then a drop move (movetype == 1) for each column in
 			//  order. That is why the math to determine the index works
-			this.submoves = this.submoves[col + (rowsCols[0].length * movetype)].submoves;
-			this.plyscalculated--;
-			if (this.submoves == null){
+			Logger.getInstance().print("About to move tree");
+			if (this.submoves[col + (rowsCols[0].length * movetype)] != null){
+				this.submoves = this.submoves[col + (rowsCols[0].length * movetype)].submoves;
+				Logger.getInstance().print("About to adjust calculated ply number");
+				this.plyscalculated--;
+				if (this.submoves == null){
+					Logger.getInstance().print("submoves was null, resetting things");
+					this.plyscalculated = 0;
+				}
+			} else {
+				this.submoves = null;
+				Logger.getInstance().print("submoves was null, resetting things");
 				this.plyscalculated = 0;
 			}
+			
+			Logger.getInstance().print("Tree moved");
 		}
+		
 	}
 	
 	public boolean isMoveValid(int player, int col, int movetype){
@@ -118,6 +131,9 @@ public class GameBoard {
 	
 
 	public void calculatePly(){
+		if (this.plyscalculated >= 10){
+			return;
+		}
 		if (this.plyscalculated == 0){
 			this.genPossibleMoves(1);
 		} else {
@@ -125,8 +141,10 @@ public class GameBoard {
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
-				if(submoves[i].getIsValid()){
-					submoves[i].calculatePly(this.plyscalculated - 1);
+				if(submoves[i] != null){
+					if(submoves[i].getIsValid()){
+						submoves[i].calculatePly(this.plyscalculated - 1);
+					}
 				}
 				if (Thread.currentThread().isInterrupted()){
 					return;
@@ -135,9 +153,12 @@ public class GameBoard {
 		}
 		
 		plyscalculated++;
-		
+	
 		for(int i = 0; i < submoves.length; i++){
-			submoves[i].nullifyRowsCols(this.plyscalculated - 2);
+			if (this.submoves[i] != null){
+				submoves[i].nullifyRowsCols(this.plyscalculated - 2);
+			}
+			
 		}
 		
 		Logger.getInstance().print(plyscalculated + " plys calculated");
@@ -157,6 +178,7 @@ public class GameBoard {
 			return;
 		}
 		int maxValue = Integer.MIN_VALUE;
+		int minValue = Integer.MAX_VALUE;
 		int maxValueIndex = 0;
 		
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
@@ -164,14 +186,20 @@ public class GameBoard {
 			if (Thread.currentThread().isInterrupted()){
 				return;
 			}
-			int tempminimax = this.submoves[i].minimax(0);
-			if (Thread.currentThread().isInterrupted()){
-				return;
+			if(this.submoves[i] != null){
+				int tempminimax = this.submoves[i].minimax(maxValue, minValue);
+				if (Thread.currentThread().isInterrupted()){
+					return;
+				}
+				if(tempminimax > maxValue){
+					maxValue = tempminimax;
+					maxValueIndex = i;
+				}
+				if (tempminimax < minValue){
+					minValue = tempminimax;
+				}
 			}
-			if(tempminimax > maxValue){
-				maxValue = tempminimax;
-				maxValueIndex = i;
-			}
+			
 		}
 		
 		if (maxValueIndex - rowsCols[0].length < 0){
