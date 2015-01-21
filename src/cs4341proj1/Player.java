@@ -45,35 +45,51 @@ public class Player {
 		//System.err.println(board);
 		
 		while(playing){
-			if(first && !firstplayed){
-				log.print("playing first");
-				firstplayed = true;
-				writeMove();
-				//System.err.println(board);
-			} else {
-				log.print("reading move");
-				readMove();
-				//System.err.println(board);
-				if(playing){
-					log.print("writing move");
+			try{
+				if(first && !firstplayed){
+					log.print("playing first");
+					firstplayed = true;
 					writeMove();
 					//System.err.println(board);
+				} else {
+					log.print("reading move");
+					readMove();
+					//System.err.println(board);
+					if(playing){
+						log.print("writing move");
+						writeMove();
+						//System.err.println(board);
+					}
 				}
+			} catch (Exception e){
+				log.print("Unhandled Exception in main thread");
+				log.print(e.toString());
+				StackTraceElement[] trace = e.getStackTrace();
+				for (StackTraceElement s : trace){
+					log.print(s.toString() + "\n\t\t");
+				}
+				playing = false;
 			}
 		}
+		//in.close();
 		log.close();
 	}
 	
 	private static void readMove() {
+		while(!in.hasNextLine()){
+			
+		}
 		String move = in.nextLine();
 		log.print("read " + move);
 		String[] moveparts = move.split(" ");
 		if (moveparts.length == 2){
 			board.applyMove((byte)2, Integer.parseInt(moveparts[0]), Integer.parseInt(moveparts[1]));
+			log.print("Opponent's move applied");
 		} else {
+			log.print("Set playing to false");
 			playing = false;
 		}
-		log.print("Opponent's move applied");
+		
 	}
 
 	private static void writeMove() {
@@ -125,6 +141,9 @@ public class Player {
 	public static void readConfig(){
 		int playernum;
 		//log.print("about to read from stdin");
+		while(!in.hasNextLine()){
+			
+		}
 		String names = in.nextLine();
 		//log.print(configs);
 		//log.print("about to split config string");
@@ -138,7 +157,9 @@ public class Player {
 			//log.print(parts[i]);
 		//}
 		//log.print("about to construct Config");
-		
+		while(!in.hasNextLine()){
+			
+		}
 		String configs = in.nextLine();
 		parts = configs.split(" ");
 		conf = Config.getInstance(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 

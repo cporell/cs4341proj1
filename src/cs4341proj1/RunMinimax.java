@@ -24,6 +24,7 @@ public class RunMinimax implements Runnable {
 			}
 
 		} catch (Exception e) {
+			Logger.getInstance().print("Unhandled exception in RunMinimax thread");
 			Logger.getInstance().print(e.toString());
 			StackTraceElement[] trace = e.getStackTrace();
 			for (StackTraceElement s : trace){
