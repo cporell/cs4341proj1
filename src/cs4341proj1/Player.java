@@ -1,6 +1,7 @@
 package cs4341proj1;
 
-import java.util.*;
+//import java.util.*;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 //import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -20,13 +21,12 @@ public class Player {
 	static GameBoard board;
 	static Logger log;
 	static String name = "Zinnia";
-	//private static final Logger log = Logger.getLogger( ClassName.class.getName() );
 
 	public static void main(String[] args) {
-		if (args.length > 1){
-			name = args[1];
+		if (args.length > 0){
+			name = args[0];
 		}
-		Logger.init(args[0]);
+		Logger.init(name + "_log.txt");
 		log = Logger.getInstance();
 		log.print("started!!!!!");
 		// TODO Auto-generated method stub
@@ -121,6 +121,7 @@ public class Player {
 			f.cancel(true);
 			//e.printStackTrace();
 		}
+		exec.shutdown();
 		/*
 		Random rand = new Random();
 		int col = rand.nextInt(conf.getNumCol());

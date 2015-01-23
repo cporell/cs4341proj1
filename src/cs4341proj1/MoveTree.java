@@ -9,7 +9,7 @@ public class MoveTree extends GameBoard {
 	//private int moveValue = Integer.MIN_VALUE;
 	private int col;
 	private int moveType;
-	private boolean terminal = false;
+	//private boolean terminal = false;
 	
 	MoveTree(GameBoard current, int player, int col, int movetype) {
 		super(current.rowsCols.length, current.rowsCols[0].length);
@@ -76,7 +76,7 @@ public class MoveTree extends GameBoard {
 		int score = 0;				// The final score to evaluate a move
 		boolean winning = isNConnected(1, N) == N;
 		boolean losing = isNConnected(2, N) == N;
-		this.terminal = winning || losing;
+		//this.terminal = winning || losing;
 		if(winning && losing){
 			// If the player's move will be a draw, set points value to low priority.
 			// Even though it is not technically a loss, it is not a win either,
@@ -159,7 +159,7 @@ public class MoveTree extends GameBoard {
 	 * @return The number of pieces connected 
 	 */
 	private int isNConnected(int player, int numConnected, int col){
-		int N = Config.getInstance().getNumWin();
+		//int N = Config.getInstance().getNumWin();
 		int topleft = 0;
 		int topright = 0;
 		int left = 0;
@@ -300,6 +300,7 @@ public class MoveTree extends GameBoard {
 				if (Thread.currentThread().isInterrupted()){
 					return currentVal;
 				}
+				currentMove = null;
 				if (this.player == 1){
 					currentMove = new MoveTree(this, 2, j, i);
 				} else {

@@ -186,6 +186,7 @@ public class GameBoard {
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
+				currentMove = null;
 				currentMove = new MoveTree(this, 1, j, i);
 				if(this.isMoveValid(1, j, i)){
 					amovewasvalid = true;
