@@ -83,38 +83,43 @@ public class MoveTree extends GameBoard {
 			// so we want to give it just above our lowest value.
 			//this.moveValue = (-(10 * N) + 1);	// Make the 'draw' state just above the 'lose' state,
 												// so it doesn't pick losing over drawing
-			return (-(10 * N) + 1);
+			return Integer.MIN_VALUE + 2;
+			
 		} else if (winning){
 			// If this is a winning move, we want to set the points value to our highest value.
 			//this.moveValue = 10 * N;
-			return 10 * N;
+			return Integer.MAX_VALUE - 1;
 		} else if (losing) {
 			// This is a losing move, so return the least desirable score. 
 			//this.moveValue = -(10 * N);
-			return -(10 * N);
+			return Integer.MIN_VALUE + 1;
 		} else {
+			int maxp1inrow = 0;
+			int maxp2inrow = 0;
 			for(int i = 1; i < 3; i++) {	// Loop generates the move evaluation for player 1, then player 2
-				for(int j = 0; j < N; j++){	// Inner loop keeps track of number of pieces connected.
-					double result = 0;
-					int prelimScore = this.isNConnected(i, j);
-					// Determine score based on n-number of connected spots
+				for(int j = 0; j < rowsCols[0].length; j++){	// Inner loop keeps track of number of pieces connected.
+					int result = 0;
+					int prelimScore = this.isNConnected(i, N, j);
 					result = this.judgePrelimScore(prelimScore);
-					if(i == 1) {	// player 1
-						player1Points += result;
+					if (i == 1){
+						if(prelimScore > maxp1inrow){
+							player1Points += result;
+							maxp1inrow = prelimScore;
+						}
+					} else {
+						if(prelimScore > maxp2inrow){
+							player2Points += result;
+							maxp2inrow = prelimScore;
+						}
 					}
-					else {			// i == 2, player 2
-						player2Points += result;
-					}
+					// Determine score based on n-number of connected spots
 				}
 			}
 		}
 		
-		if(this.player == 1){
-			score = player1Points - player2Points;	
-		}
-		else {	// else player == 2
-			score = player2Points - player1Points;
-		}
+		
+		score = player1Points - (int)((double)player2Points * 1.5);
+		
 		return score;
 	}
 	
@@ -122,25 +127,29 @@ public class MoveTree extends GameBoard {
 	 * Judges the preliminary score given by isNConnected.
 	 * Awards a certain amount of points based on the number given, and the number of pieces needed to win. 
 	 */
-	public double judgePrelimScore(int prelimScore) {
-		double score = 0;
-		double NtoWin = (double) Config.getInstance().getNumWin();
+	public int judgePrelimScore(int prelimScore) {
+		int score = 0;
+		int NtoWin = Config.getInstance().getNumWin();
 		if(prelimScore == NtoWin) {
-			score = Math.pow(10, NtoWin);
+			score = 10 * NtoWin;
 		}
 		else if(prelimScore == NtoWin - 1) {
-			score = Math.pow(10, NtoWin-1);
+			score = 10 * (NtoWin - 1);
 		}
 		else if(prelimScore == NtoWin - 2) {
-			score = Math.pow(10, NtoWin-2);
+			score = 10 * (NtoWin - 2);
 		}
 		else if(prelimScore <= NtoWin - 3) {
-			score = Math.pow(10, NtoWin - prelimScore);
+			score = 10 * (NtoWin - prelimScore);
 		}
 		else {
 			score = 0;
 		}
 		return score;
+	}
+	
+	private int isNConnected(int player, int numConnected){
+		return isNConnected(player, numConnected, this.col);
 	}
 	
 	/**
@@ -149,7 +158,7 @@ public class MoveTree extends GameBoard {
 	 * @param player The player whose pieces we are looking up.
 	 * @return The number of pieces connected 
 	 */
-	private int isNConnected(int player, int numConnected){
+	private int isNConnected(int player, int numConnected, int col){
 		int N = Config.getInstance().getNumWin();
 		int topleft = 0;
 		int topright = 0;
@@ -303,16 +312,12 @@ public class MoveTree extends GameBoard {
 					if (this.player == 1){
 						if(childVal < currentVal) {
 							currentVal = childVal;
-							if(childVal < beta){
-								beta = childVal;
-							}
+							beta = Math.min(beta, currentVal);
 						}
 					} else {
 						if(childVal > currentVal) {
 							currentVal = childVal;
-							if(childVal < alpha){
-								alpha = childVal;
-							}
+							alpha = Math.max(alpha, currentVal);
 						}
 					}
 					if(beta <= alpha){
@@ -327,7 +332,7 @@ public class MoveTree extends GameBoard {
 			}
 		}
 		if (allMovesInvalid){
-			return (-(10 * N) + 1);
+			return Integer.MIN_VALUE + 1;
 		}
 		return currentVal;
 	}

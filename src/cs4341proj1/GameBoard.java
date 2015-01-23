@@ -82,11 +82,7 @@ public class GameBoard {
 			return rowsCols[rowsCols.length - 1][col] == player;
 
 		} else {//drop
-			if(nextOpenRow(col) < 0){
-				return false;
-			} else {
-				return true;
-			}
+			return nextOpenRow(col) >= 0;
 		}
 	}
 
@@ -180,9 +176,10 @@ public class GameBoard {
 	public void minimax(int depth) {
 		int maxValue = Integer.MIN_VALUE;
 		int minValue = Integer.MAX_VALUE;
-		int[] maxValueIndex = {0, 0};
+		int[] maxValueIndex = new int[2];
 		MoveTree currentMove;
-
+		boolean amovewasvalid = false;
+		
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
 		for (int i = 0; i < 2; i++){
 			for (int j = 0; j < rowsCols[0].length; j++){
@@ -190,7 +187,8 @@ public class GameBoard {
 					return;
 				}
 				currentMove = new MoveTree(this, 1, j, i);
-				if(currentMove.getIsValid()){
+				if(this.isMoveValid(1, j, i)){
+					amovewasvalid = true;
 					int tempminimax = currentMove.minimax(depth - 1, maxValue, minValue);
 					if (Thread.currentThread().isInterrupted()){
 						return;
@@ -205,6 +203,12 @@ public class GameBoard {
 					}
 				}
 			}
+		}
+		if(!amovewasvalid){
+			Logger.getInstance().print("WTF");
+		}
+		if(p1pop){
+			Logger.getInstance().print("p1 has popped");
 		}
 
 		this.bestmove = maxValueIndex;

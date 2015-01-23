@@ -49,7 +49,11 @@ public class Player {
 				if(first && !firstplayed){
 					log.print("playing first");
 					firstplayed = true;
-					writeMove();
+					//writeMove();
+					int[] bestmove = {conf.getNumCol() / 2 , 1};
+					board.applyMove((byte)1, bestmove[0], bestmove[1]);
+					log.print("best move = " + bestmove[0] + " " + bestmove[1]);
+					System.out.println(bestmove[0] + " " + bestmove[1]);
 					//System.err.println(board);
 				} else {
 					log.print("reading move");
@@ -133,7 +137,7 @@ public class Player {
 		log.print("best move = " + bestmove[0] + " " + bestmove[1]);
 		board.applyMove((byte)1, bestmove[0], bestmove[1]);
 		System.out.println(bestmove[0] + " " + bestmove[1]);
-		log.print("best move printed");
+		//log.print("best move printed");
 		//log.print(bestmove[0] + " " + bestmove[1]);
 		
 	}
