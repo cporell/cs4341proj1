@@ -7,18 +7,18 @@ public class GameBoard {
 	protected byte[][] rowsCols;
 	protected boolean p1pop = false;
 	protected boolean p2pop = false;
-	protected MoveTree[] submoves = null;
-	private int plyscalculated = 0;
+	//protected MoveTree[] submoves = null;
+	//private int plyscalculated = 0;
 	private int[] bestmove = new int[2];
-	
+
 	protected GameBoard(int numRows, int numCols){
 		rowsCols = new byte[numRows][numCols];
 		for (int i = 0; i < numRows; i++){
 			Arrays.fill(rowsCols[i], (byte)0);
 		}
-		
+
 	}
-	
+
 	public static GameBoard getInstance(){
 		if (instance == null){
 			instance = new GameBoard(Config.getInstance().getNumRows(),
@@ -26,7 +26,7 @@ public class GameBoard {
 		}
 		return instance;
 	}
-	
+
 	public void applyMove(byte player, int col, int movetype){
 		if (movetype == 0){//pop
 			if(player == 1){
@@ -43,6 +43,7 @@ public class GameBoard {
 			rowsCols[nextOpenRow(col)][col] = player;
 		}
 		//Logger.getInstance().print("Move applied");
+		/*
 		if (this.submoves != null){
 			//This next line replaces the gameboard's submove tree with that of the 
 			//  hypothetical move that matches the one that was just applied
@@ -63,12 +64,13 @@ public class GameBoard {
 				Logger.getInstance().print("submoves was null, resetting things");
 				this.plyscalculated = 0;
 			}
-			
+
 			Logger.getInstance().print("Tree moved");
 		}
-		
+		 */
+
 	}
-	
+
 	public boolean isMoveValid(int player, int col, int movetype){
 		if (movetype == 0){//pop
 			if(player == 1 && p1pop){
@@ -78,7 +80,7 @@ public class GameBoard {
 				return false;
 			}
 			return rowsCols[rowsCols.length - 1][col] == player;
-			
+
 		} else {//drop
 			if(nextOpenRow(col) < 0){
 				return false;
@@ -87,7 +89,7 @@ public class GameBoard {
 			}
 		}
 	}
-	
+
 	protected int nextOpenRow(int col){
 		for (int i = 0; i < rowsCols.length; i++){
 			if(rowsCols[i][col] != 0){
@@ -96,7 +98,7 @@ public class GameBoard {
 		}
 		return rowsCols.length - 1;
 	}
-	
+
 	@Override
 	public String toString(){
 		String result = "";
@@ -108,7 +110,7 @@ public class GameBoard {
 		}
 		return result;
 	}
-	
+/*
 	public void genPossibleMoves(int player){
 		//Logger.getInstance().print("Called From" + (this instanceof MoveTree));
 		MoveTree[] result = new MoveTree[rowsCols[0].length * 2];
@@ -128,7 +130,7 @@ public class GameBoard {
 		}
 		this.submoves = result;
 	}
-	
+
 
 	public boolean calculatePly(){
 		if (this.plyscalculated >= 5){
@@ -150,67 +152,61 @@ public class GameBoard {
 					return false;
 				}
 			}
-			
+
 		}
-		
+
 		plyscalculated++;
-	
+
 		for(int i = 0; i < submoves.length; i++){
 			if (this.submoves[i] != null){
 				submoves[i].nullifyRowsCols(this.plyscalculated - 2);
 			}
-			
+
 		}
-		
+
 		Logger.getInstance().print(plyscalculated + " plys calculated");
 		return true;
 	}
-	
+*/
 	public int[] getBestMove(){
 		return this.bestmove;
 	}
-	
+
 	/**
 	 * Function to search for the best possible move via minimax
 	 * Gathers all the minimax values of its movetrees, then chooses the maximum value and returns it.
 	 * Returns an array holding two ints: the column to move in, and the move type
 	 */
-	public void minimax() {
-		if (this.submoves == null){
-			return;
-		}
+	public void minimax(int depth) {
 		int maxValue = Integer.MIN_VALUE;
 		int minValue = Integer.MAX_VALUE;
-		int maxValueIndex = 0;
-		
+		int[] maxValueIndex = {0, 0};
+		MoveTree currentMove;
+
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
-		for(int i = 0; i < this.submoves.length; i++) {
-			if (Thread.currentThread().isInterrupted()){
-				return;
-			}
-			if(this.submoves[i] != null){
-				int tempminimax = this.submoves[i].minimax(maxValue, minValue);
+		for (int i = 0; i < 2; i++){
+			for (int j = 0; j < rowsCols[0].length; j++){
 				if (Thread.currentThread().isInterrupted()){
 					return;
 				}
-				if(tempminimax > maxValue){
-					maxValue = tempminimax;
-					maxValueIndex = i;
-				}
-				if (tempminimax < minValue){
-					minValue = tempminimax;
+				currentMove = new MoveTree(this, 1, j, i);
+				if(currentMove.getIsValid()){
+					int tempminimax = currentMove.minimax(depth - 1, maxValue, minValue);
+					if (Thread.currentThread().isInterrupted()){
+						return;
+					}
+					if(tempminimax > maxValue){
+						maxValue = tempminimax;
+						maxValueIndex[0] = j;
+						maxValueIndex[1] = i;
+					}
+					if (tempminimax < minValue){
+						minValue = tempminimax;
+					}
 				}
 			}
-			
 		}
-		
-		if (maxValueIndex - rowsCols[0].length < 0){
-			this.bestmove[0] = maxValueIndex;
-			this.bestmove[1] = 0;
-		} else {
-			this.bestmove[0] = maxValueIndex - rowsCols[0].length;
-			this.bestmove[1] = 1;
-		}
-		
+
+		this.bestmove = maxValueIndex;
 	}
 }

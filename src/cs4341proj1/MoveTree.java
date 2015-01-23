@@ -6,11 +6,10 @@ public class MoveTree extends GameBoard {
 	
 	private boolean isvalid;
 	private int player;
-	private int moveValue = Integer.MIN_VALUE;
+	//private int moveValue = Integer.MIN_VALUE;
 	private int col;
 	private int moveType;
 	private boolean terminal = false;
-	private int prunedlength;
 	
 	MoveTree(GameBoard current, int player, int col, int movetype) {
 		super(current.rowsCols.length, current.rowsCols[0].length);
@@ -25,20 +24,18 @@ public class MoveTree extends GameBoard {
 		this.moveType = movetype;
 		
 		this.isvalid = this.isMoveValid(player, col, movetype);
+		
+		if (this.isvalid){
+			this.applyMove((byte)player, col, moveType);
+		}
 		//Logger.getInstance().print("Valid: " + this.isvalid + " player" + player
 		//		+ " col: " + col + " movetype: " + movetype);
 		
-		this.init();
+
 		
 	}
 	
-	private void init(){
-		if (this.isvalid && !this.terminal){
-			this.applyMove((byte)player, col, moveType);
-			this.evalMove();
-		}
-	}
-	
+
 	public boolean getIsValid(){
 		return this.isvalid;
 	}
@@ -47,6 +44,7 @@ public class MoveTree extends GameBoard {
 		return this.moveType;
 	}
 	
+	/*
 	public void genPossibleMoves(){
 		//Logger.getInstance().print("genPossibleMoves(): Valid: " + this.isvalid);
 		if (this.isvalid){
@@ -64,13 +62,14 @@ public class MoveTree extends GameBoard {
 		}
 		//this.rowsCols = null;
 	}
+	/*
 	
 	/**
 	 * This is the heuristic evaluation for a move.
 	 * It assigns a points value based on the current state of the board.
 	 * This points value will eventually be assigned to this MoveTree's moveValue.
 	 */
-	public void evalMove(){
+	public int evalMove(){
 		int N = Config.getInstance().getNumWin();	// Grab the 'N' we have to connect
 		int player1Points = 0;		// The amount of points the player's pieces give
 		int player2Points = 0;		// The amount of points the opponent's pieces give
@@ -82,17 +81,17 @@ public class MoveTree extends GameBoard {
 			// If the player's move will be a draw, set points value to low priority.
 			// Even though it is not technically a loss, it is not a win either,
 			// so we want to give it just above our lowest value.
-			this.moveValue = (-(10 * N) + 1);	// Make the 'draw' state just above the 'lose' state,
+			//this.moveValue = (-(10 * N) + 1);	// Make the 'draw' state just above the 'lose' state,
 												// so it doesn't pick losing over drawing
-			return;
+			return (-(10 * N) + 1);
 		} else if (winning){
 			// If this is a winning move, we want to set the points value to our highest value.
-			this.moveValue = 10 * N;
-			return;
+			//this.moveValue = 10 * N;
+			return 10 * N;
 		} else if (losing) {
 			// This is a losing move, so return the least desirable score. 
-			this.moveValue = -(10 * N);
-			return;
+			//this.moveValue = -(10 * N);
+			return -(10 * N);
 		} else {
 			for(int i = 1; i < 3; i++) {	// Loop generates the move evaluation for player 1, then player 2
 				for(int j = 0; j < N; j++){	// Inner loop keeps track of number of pieces connected.
@@ -116,7 +115,7 @@ public class MoveTree extends GameBoard {
 		else {	// else player == 2
 			score = player2Points - player1Points;
 		}
-		this.moveValue = score;
+		return score;
 	}
 	
 	/**
@@ -159,6 +158,7 @@ public class MoveTree extends GameBoard {
 		int bottomright = 0;
 		int bottomleft = 0;
 		int bottom = 0;
+		int maxConnected = Integer.MIN_VALUE;
 		for(int i = 0; i < rowsCols.length; i++){
 			if (rowsCols[i][col] == player){
 				for (int j = 1; i - j >= 0 && col - j >= 0; j++){//top left
@@ -217,9 +217,10 @@ public class MoveTree extends GameBoard {
 					return numConnected;
 				}
 			}
+			maxConnected = Math.max(maxConnected, getMaxConnected(topleft + bottomright + 1, topright + bottomleft + 1,
+					left + right + 1, bottom + 1));
 		}
-		int maxConnected = getMaxConnected(topleft + bottomright + 1, topright + bottomleft + 1,
-											left + right + 1, bottom + 1);
+		
 		return maxConnected;
 	}
 	
@@ -238,7 +239,7 @@ public class MoveTree extends GameBoard {
 		return max;
 	}
 	
-
+/*
 	public void calculatePly(int depth){
 		if (depth == 0 && this.isvalid){
 			this.genPossibleMoves();
@@ -253,6 +254,7 @@ public class MoveTree extends GameBoard {
 			}
 		}
 	}
+	*/
 	
 	/**
 	 * The child version of minimax.
@@ -260,71 +262,74 @@ public class MoveTree extends GameBoard {
 	 * If this is a leaf move (has no child nodes), return the value for this leaf
 	 * Else, returns the move with the lowest value among its children leaves 
 	 */
-	public int minimax(int alpha, int beta) {
+	public int minimax(int depth, int alpha, int beta) {
 		//int[] miniVal = new int[2];
-		
+		boolean allMovesInvalid = true;
 		// Stores the value of the move with the lowest value
-		int currentVal = this.moveValue;	
+		//int currentVal = this.moveValue;
+		int currentVal;
+		if (this.player == 1){
+			currentVal = Integer.MAX_VALUE;
+		} else {
+			currentVal = Integer.MIN_VALUE;
+		}
+		
+		MoveTree currentMove;
 		
 		//miniVal[0] = this.col;			// Store the column the action will take place in
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
-		
-		if(this.submoves == null || this.terminal) {
-			return currentVal;
+		int N = Config.getInstance().getNumWin();
+		if (depth == 0 || (this.isNConnected(1, N) == N || this.isNConnected(2, N) == N)){
+			return this.evalMove();
 		}
 		
 		// If we got here, then this leaf has children.
 		// Search those children for the one with the lowest value, and return its column and move
 		//for(MoveTree children: this.submoves) {
-		for(int i = 0; i < this.prunedlength; i++){	
-			if (Thread.currentThread().isInterrupted()){
-				return currentVal;
-			}
-			if (this.submoves[i].isvalid){
-				int childVal = this.submoves[i].minimax(alpha, beta);
-				if (this.player == 1){
-					if(childVal < currentVal) {
-						currentVal = childVal;
-						if(childVal < beta){
-							beta = childVal;
-						}
-					}
-				} else {
-					if(childVal > currentVal) {
-						currentVal = childVal;
-						if(childVal < alpha){
-							alpha = childVal;
-						}
-					}
-				}
-				if(beta <= alpha){
-					//prune(i);
+		for (int i = 0; i < 2; i++){
+			for (int j = 0; j < rowsCols[0].length; j++){
+				if (Thread.currentThread().isInterrupted()){
 					return currentVal;
 				}
+				if (this.player == 1){
+					currentMove = new MoveTree(this, 2, j, i);
+				} else {
+					currentMove = new MoveTree(this, 1, j, i);
+				}
 				
-			}
-			if (Thread.currentThread().isInterrupted()){
-				return currentVal;
+				if (currentMove.isvalid){
+					allMovesInvalid = false;
+					int childVal = currentMove.minimax(depth - 1, alpha, beta);
+					if (this.player == 1){
+						if(childVal < currentVal) {
+							currentVal = childVal;
+							if(childVal < beta){
+								beta = childVal;
+							}
+						}
+					} else {
+						if(childVal > currentVal) {
+							currentVal = childVal;
+							if(childVal < alpha){
+								alpha = childVal;
+							}
+						}
+					}
+					if(beta <= alpha){
+						//prune(i);
+						return currentVal;
+					}
+
+				}
+				if (Thread.currentThread().isInterrupted()){
+					return currentVal;
+				}
 			}
 		}
-		
+		if (allMovesInvalid){
+			return (-(10 * N) + 1);
+		}
 		return currentVal;
 	}
 	
-	public void nullifyRowsCols(int depth){
-		if (depth == 0){
-			this.rowsCols = null;
-		} else if (this.submoves != null){
-			for(int i = 0; i < this.prunedlength; i++){
-				submoves[i].nullifyRowsCols(depth - 1);
-			}
-		}
-	}
-	
-	private void prune(int index){
-		for (int i = index + 1; i < this.submoves.length; i++){
-			//this.submoves[i] = null;
-		}
-		this.prunedlength = index + 1;
-	}
 }

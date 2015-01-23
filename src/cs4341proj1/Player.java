@@ -103,7 +103,7 @@ public class Player {
 		exec.execute(f);
 		
 		try {
-			f.get(conf.getTurnlen() - 2, TimeUnit.SECONDS);
+			f.get((conf.getTurnlen() * 1000) - 500, TimeUnit.MILLISECONDS);
 			//f.get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
