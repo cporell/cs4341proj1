@@ -1,5 +1,6 @@
 package cs4341proj1;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MoveTree extends GameBoard {
@@ -71,11 +72,11 @@ public class MoveTree extends GameBoard {
 	 */
 	public int evalMove(){
 		int N = Config.getInstance().getNumWin();	// Grab the 'N' we have to connect
-		int player1Points = 0;		// The amount of points the player's pieces give
-		int player2Points = 0;		// The amount of points the opponent's pieces give
-		int score = 0;				// The final score to evaluate a move
-		boolean winning = isNConnected(1, N) == N;
-		boolean losing = isNConnected(2, N) == N;
+		//int player1Points = 0;		// The amount of points the player's pieces give
+		//int player2Points = 0;		// The amount of points the opponent's pieces give
+		//int score = 0;				// The final score to evaluate a move
+		boolean winning = isNConnected((byte)1, N) == N;
+		boolean losing = isNConnected((byte)2, N) == N;
 		//this.terminal = winning || losing;
 		if(winning && losing){
 			// If the player's move will be a draw, set points value to low priority.
@@ -94,33 +95,178 @@ public class MoveTree extends GameBoard {
 			//this.moveValue = -(10 * N);
 			return Integer.MIN_VALUE + 1;
 		} else {
-			int maxp1inrow = 0;
-			int maxp2inrow = 0;
-			for(int i = 1; i < 3; i++) {	// Loop generates the move evaluation for player 1, then player 2
-				for(int j = 0; j < rowsCols[0].length; j++){	// Inner loop keeps track of number of pieces connected.
-					int result = 0;
-					int prelimScore = this.isNConnected(i, N, j);
-					result = this.judgePrelimScore(prelimScore);
-					if (i == 1){
-						if(prelimScore > maxp1inrow){
-							player1Points += result;
-							maxp1inrow = prelimScore;
-						}
-					} else {
-						if(prelimScore > maxp2inrow){
-							player2Points += result;
-							maxp2inrow = prelimScore;
-						}
-					}
-					// Determine score based on n-number of connected spots
-				}
-			}
+			return scanBoard();
 		}
 		
 		
-		score = player1Points - (int)((double)player2Points * 1.5);
+		//score = player1Points - (int)((double)player2Points * 1.5);
 		
+		//return score;
+	}
+	
+	private int scanBoard(){
+		int score = 0;
+		ArrayList<Coords> visitedVertical = new ArrayList<Coords>();
+		ArrayList<Coords> visitedHorizontal = new ArrayList<Coords>();
+		ArrayList<Coords> visitedDownDiag = new ArrayList<Coords>();
+		ArrayList<Coords> visitedUpDiag = new ArrayList<Coords>();
+		for (int i = 0; i < rowsCols.length; i++){
+				for (int j = 0; j < rowsCols[0].length; j++){
+					if(rowsCols[i][j] == (byte)1){
+						analyzeVertical(i, j, visitedVertical);
+						analyzeHorizontal(i, j, visitedHorizontal);
+						analyzeDownDiag(i,j, visitedDownDiag);
+						analyzeUpDiag(i,j, visitedUpDiag);
+					} else if (rowsCols[i][j] == (byte)2){
+						analyzeVertical(i, j, visitedVertical);
+						analyzeHorizontal(i, j, visitedHorizontal);
+						analyzeDownDiag(i,j, visitedDownDiag);
+						analyzeUpDiag(i,j, visitedUpDiag);
+					}
+				}
+		}
 		return score;
+	}
+	
+	private int analyzeVertical(int row, int col, ArrayList<Coords> visited){
+		//int N = Config.getInstance().getNumWin();
+		int connected = 1;
+		if (visited.contains(new Coords(row, col))){
+			return 0;
+		}
+		visited.add(new Coords(row, col));
+		for(int i = row - 1; i > -1; i--){
+			if(rowsCols[i][col] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(i, col));
+			} else {
+				break;
+			}
+		}
+		for(int i = row + 1; i < rowsCols.length; i++){
+			if(rowsCols[i][col] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(i, col));
+			} else {
+				break;
+			}
+		}
+		if(nextOpenRow(col) == row - 1){
+			return connected;
+		} else {
+			return 0;
+		}
+	}
+	
+	private int analyzeHorizontal(int row, int col, ArrayList<Coords> visited){
+		//int N = Config.getInstance().getNumWin();
+		int connected = 1;
+		boolean open = false;
+		if (visited.contains(new Coords(row, col))){
+			return 0;
+		}
+		visited.add(new Coords(row, col));
+		for(int i = col - 1; i > -1; i--){
+			if(rowsCols[row][i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row, i));
+			} else if(rowsCols[row][i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		for(int i = col + 1; i < rowsCols[0].length; i++){
+			if(rowsCols[row][i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row, i));
+			} else if(rowsCols[row][i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		if(open){
+			return connected;
+		} else {
+			return 0;
+		}
+	}
+	
+	private int analyzeUpDiag(int row, int col, ArrayList<Coords> visited){
+		//int N = Config.getInstance().getNumWin();
+		int connected = 1;
+		boolean open = false;
+		if (visited.contains(new Coords(row, col))){
+			return 0;
+		}
+		visited.add(new Coords(row, col));
+		for(int i = 1; row + i < rowsCols.length && col -i > - 1 ; i++){
+			if(rowsCols[row + i][col - i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row + i, col - i));
+			} else if(rowsCols[row + i][col - i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		for(int i = 1; row - i > -1 && col + i < rowsCols[0].length; i++){
+			if(rowsCols[row - i][col + i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row - i, col + i));
+			} else if(rowsCols[row - i][col + i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		if(open){
+			return connected;
+		} else {
+			return 0;
+		}
+	}
+	
+	private int analyzeDownDiag(int row, int col, ArrayList<Coords> visited){
+		//int N = Config.getInstance().getNumWin();
+		int connected = 1;
+		boolean open = false;
+		if (visited.contains(new Coords(row, col))){
+			return 0;
+		}
+		visited.add(new Coords(row, col));
+		for(int i = 1; row - i > -1 && col -i > - 1 ; i++){
+			if(rowsCols[row - i][col - i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row - i, col - i));
+			} else if(rowsCols[row - i][col - i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		for(int i = 1; row + i < rowsCols.length && col + i < rowsCols[0].length; i++){
+			if(rowsCols[row + i][col + i] == rowsCols[row][col]){
+				connected++;
+				visited.add(new Coords(row + i, col + i));
+			} else if(rowsCols[row + i][col + i] == (byte)0){
+				open = true;
+				break;
+			} else {
+				break;
+			}
+		}
+		if(open){
+			return connected;
+		} else {
+			return 0;
+		}
 	}
 	
 	/**
@@ -148,7 +294,7 @@ public class MoveTree extends GameBoard {
 		return score;
 	}
 	
-	private int isNConnected(int player, int numConnected){
+	private int isNConnected(byte player, int numConnected){
 		return isNConnected(player, numConnected, this.col);
 	}
 	
@@ -158,7 +304,7 @@ public class MoveTree extends GameBoard {
 	 * @param player The player whose pieces we are looking up.
 	 * @return The number of pieces connected 
 	 */
-	private int isNConnected(int player, int numConnected, int col){
+	private int isNConnected(byte player, int numConnected, int col){
 		//int N = Config.getInstance().getNumWin();
 		int topleft = 0;
 		int topright = 0;
@@ -288,7 +434,7 @@ public class MoveTree extends GameBoard {
 		//miniVal[0] = this.col;			// Store the column the action will take place in
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
 		int N = Config.getInstance().getNumWin();
-		if (depth == 0 || (this.isNConnected(1, N) == N || this.isNConnected(2, N) == N)){
+		if (depth == 0 || (this.isNConnected((byte)1, N) == N || this.isNConnected((byte)2, N) == N)){
 			return this.evalMove();
 		}
 		
@@ -311,15 +457,11 @@ public class MoveTree extends GameBoard {
 					allMovesInvalid = false;
 					int childVal = currentMove.minimax(depth - 1, alpha, beta);
 					if (this.player == 1){
-						if(childVal < currentVal) {
-							currentVal = childVal;
-							beta = Math.min(beta, currentVal);
-						}
+						currentVal = Math.min(childVal, currentVal);
+						beta = Math.min(beta, currentVal);
 					} else {
-						if(childVal > currentVal) {
-							currentVal = childVal;
-							alpha = Math.max(alpha, currentVal);
-						}
+						currentVal = Math.max(childVal, currentVal);
+						alpha = Math.max(alpha, currentVal);
 					}
 					if(beta <= alpha){
 						//prune(i);
