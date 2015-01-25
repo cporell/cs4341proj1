@@ -2,6 +2,7 @@ package cs4341proj1;
 
 public class RunMinimax implements Runnable {
 
+	// Runs the minimax during move evaluation.
 	@Override
 	public void run() {
 		try {
@@ -9,14 +10,10 @@ public class RunMinimax implements Runnable {
 			GameBoard board = GameBoard.getInstance();
 			int i = 1;
 
+			// As long as the thread is active, continue to work.
 			while(!Thread.currentThread().isInterrupted()){
-				
-				//log.print(board.toString());
-				//log.print("About to minimax");
 				board.minimax(i);
 				Logger.getInstance().print("Calculated " + i + "plys");
-				//System.gc();
-				//log.print(board.toString());
 				i++;
 			}
 

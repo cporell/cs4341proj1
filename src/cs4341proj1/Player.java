@@ -11,7 +11,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-
+// Player class holds the player info and plays the game.
+// It stores the game configuration, a Scanner, various game info, and the AI's name.
 public class Player {
 	static Config conf;
 	static Scanner in;// = new Scanner(System.in);
@@ -22,6 +23,7 @@ public class Player {
 	static Logger log;
 	static String name = "Zinnia";
 
+	// Runs the player. At the start, sends all the necessary info to the Referee and the logger.
 	public static void main(String[] args) {
 		if (args.length > 0){
 			name = args[0];
@@ -29,8 +31,6 @@ public class Player {
 		Logger.init(name + "_log.txt");
 		log = Logger.getInstance();
 		log.print("started!!!!!");
-		// TODO Auto-generated method stub
-		//System.out.println("Test");
 		in = new Scanner(System.in);
 		log.print("About to send Name");
 		sendName();
@@ -42,10 +42,11 @@ public class Player {
 		
 		log.print("generating game board");
 		board = GameBoard.getInstance();
-		//System.err.println(board);
 		
+		// The game loop. Handles behavior until a game over.
 		while(playing){
 			try{
+				// If we go first, play towards the middle of the board.
 				if(first && !firstplayed){
 					log.print("playing first");
 					firstplayed = true;
@@ -56,6 +57,7 @@ public class Player {
 					System.out.println(bestmove[0] + " " + bestmove[1]);
 					//System.err.println(board);
 				} else {
+					// Else, if we don't go first, play to adapt to the opponent's first move.
 					log.print("reading move");
 					readMove();
 					//System.err.println(board);
@@ -68,6 +70,7 @@ public class Player {
 					}
 				}
 			} catch (Exception e){
+				// Oops! If we got here, something went wrong.
 				log.print("Unhandled Exception in main thread");
 				log.print(e.toString());
 				StackTraceElement[] trace = e.getStackTrace();
@@ -78,11 +81,11 @@ public class Player {
 			}
 		}
 		log.print("About to quit");
-		//in.close();
 		log.close();
 		System.exit(0);
 	}
 	
+	// Reads in a move. If it is of the proper format, write it to the gameboard.
 	private static void readMove() {
 		while(!in.hasNextLine()){
 			
@@ -100,8 +103,10 @@ public class Player {
 		
 	}
 
+	// Writes a move to the gameboard.
+	// This part also handles the thread. The thread is used for timing purposes- if we have a timeout,
+	// we can end the thread easily and base our move on what's been done so far.
 	private static void writeMove() {
-		//log.print(board.toString());
 		FutureTask<Void> f = new FutureTask<Void>(new RunMinimax(), null);
 		ExecutorService exec = Executors.newFixedThreadPool(1);
 		exec.execute(f);
@@ -122,50 +127,32 @@ public class Player {
 			//e.printStackTrace();
 		}
 		exec.shutdown();
-		/*
-		Random rand = new Random();
-		int col = rand.nextInt(conf.getNumCol());
-		int movetype = rand.nextInt(2);
-		log.print(col + " " + movetype);
-		while(!board.isMoveValid(1, col, movetype)){
-			col = rand.nextInt(conf.getNumCol());
-			movetype = rand.nextInt(2);
-			log.print(col + " " + movetype);
-		}
-		*/
-		//log.print(board.toString());
+
 		int[] bestmove = board.getBestMove();
 		log.print("best move = " + bestmove[0] + " " + bestmove[1]);
 		board.applyMove((byte)1, bestmove[0], bestmove[1]);
 		System.out.println(bestmove[0] + " " + bestmove[1]);
-		//log.print("best move printed");
-		//log.print(bestmove[0] + " " + bestmove[1]);
 		
 	}
 
+	// Send the player name to the Ref.
 	static public void sendName(){
 		System.out.println(name);
 	}
 	
+	// Reads in the configs from the Ref, and stores it in the Config object.
 	public static void readConfig(){
 		int playernum;
-		//log.print("about to read from stdin");
 		while(!in.hasNextLine()){
 			
 		}
 		String names = in.nextLine();
-		//log.print(configs);
-		//log.print("about to split config string");
 		String[] parts = names.split(" ");
 		if(parts[1].equals(name)){
 			playernum = 0;
 		} else {
 			playernum = 1;
 		}
-		//for (int i = 0; i < parts.length; i++){
-			//log.print(parts[i]);
-		//}
-		//log.print("about to construct Config");
 		while(!in.hasNextLine()){
 			
 		}
@@ -174,7 +161,6 @@ public class Player {
 		conf = Config.getInstance(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 
 				Integer.parseInt(parts[2]), playernum, Integer.parseInt(parts[4]), 
 				Integer.parseInt(parts[3]) - 1);
-		//log.print("readConfig done");
 	}
 
 }
