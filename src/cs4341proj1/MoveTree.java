@@ -71,6 +71,7 @@ public class MoveTree extends GameBoard {
 	 * This points value will eventually be assigned to this MoveTree's moveValue.
 	 */
 	public int evalMove(){
+		//Logger.getInstance().print(this.toString());
 		int N = Config.getInstance().getNumWin();	// Grab the 'N' we have to connect
 		//int player1Points = 0;		// The amount of points the player's pieces give
 		//int player2Points = 0;		// The amount of points the opponent's pieces give
@@ -113,15 +114,15 @@ public class MoveTree extends GameBoard {
 		for (int i = 0; i < rowsCols.length; i++){
 				for (int j = 0; j < rowsCols[0].length; j++){
 					if(rowsCols[i][j] == (byte)1){
-						analyzeVertical(i, j, visitedVertical);
-						analyzeHorizontal(i, j, visitedHorizontal);
-						analyzeDownDiag(i,j, visitedDownDiag);
-						analyzeUpDiag(i,j, visitedUpDiag);
+						score += analyzeVertical(i, j, visitedVertical);
+						score += analyzeHorizontal(i, j, visitedHorizontal);
+						score += analyzeDownDiag(i,j, visitedDownDiag);
+						score += analyzeUpDiag(i,j, visitedUpDiag);
 					} else if (rowsCols[i][j] == (byte)2){
-						analyzeVertical(i, j, visitedVertical);
-						analyzeHorizontal(i, j, visitedHorizontal);
-						analyzeDownDiag(i,j, visitedDownDiag);
-						analyzeUpDiag(i,j, visitedUpDiag);
+						score -= analyzeVertical(i, j, visitedVertical);
+						score -= analyzeHorizontal(i, j, visitedHorizontal);
+						score -= analyzeDownDiag(i,j, visitedDownDiag);
+						score -= analyzeUpDiag(i,j, visitedUpDiag);
 					}
 				}
 		}
@@ -306,15 +307,16 @@ public class MoveTree extends GameBoard {
 	 */
 	private int isNConnected(byte player, int numConnected, int col){
 		//int N = Config.getInstance().getNumWin();
-		int topleft = 0;
-		int topright = 0;
-		int left = 0;
-		int right = 0;
-		int bottomright = 0;
-		int bottomleft = 0;
-		int bottom = 0;
+
 		int maxConnected = Integer.MIN_VALUE;
 		for(int i = 0; i < rowsCols.length; i++){
+			int topleft = 0;
+			int topright = 0;
+			int left = 0;
+			int right = 0;
+			int bottomright = 0;
+			int bottomleft = 0;
+			int bottom = 0;
 			if (rowsCols[i][col] == player){
 				for (int j = 1; i - j >= 0 && col - j >= 0; j++){//top left
 					if (rowsCols[i - j][col - j] == player){

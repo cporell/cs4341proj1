@@ -1,6 +1,8 @@
 package cs4341proj1;
 
 import java.util.Arrays;
+import java.util.Random;
+
 
 public class GameBoard {
 	private static GameBoard instance = null;
@@ -10,6 +12,7 @@ public class GameBoard {
 	//protected MoveTree[] submoves = null;
 	//private int plyscalculated = 0;
 	private int[] bestmove = new int[2];
+	Random rand = new Random();
 
 	protected GameBoard(int numRows, int numCols){
 		rowsCols = new byte[numRows][numCols];
@@ -179,6 +182,8 @@ public class GameBoard {
 		int[] maxValueIndex = new int[2];
 		MoveTree currentMove;
 		boolean amovewasvalid = false;
+		//Logger.getInstance().print(this.toString());
+		
 		
 		// Search through the moveTrees and to find the highest value of all the minimaxes.
 		for (int i = 0; i < 2; i++){
@@ -194,10 +199,17 @@ public class GameBoard {
 					if (Thread.currentThread().isInterrupted()){
 						return;
 					}
+					Logger.getInstance().print(j + "," + i + " minimax = " + tempminimax);
 					if(tempminimax > maxValue){
 						maxValue = tempminimax;
 						maxValueIndex[0] = j;
 						maxValueIndex[1] = i;
+					}
+					if (tempminimax == maxValue){
+						if(rand.nextInt(2) == 1){
+							maxValueIndex[0] = j;
+							maxValueIndex[1] = i;
+						}
 					}
 					if (tempminimax < minValue){
 						minValue = tempminimax;
@@ -208,9 +220,9 @@ public class GameBoard {
 		if(!amovewasvalid){
 			Logger.getInstance().print("WTF");
 		}
-		if(p1pop){
-			Logger.getInstance().print("p1 has popped");
-		}
+		//if(p1pop){
+		//	Logger.getInstance().print("p1 has popped");
+		//}
 
 		this.bestmove = maxValueIndex;
 	}
