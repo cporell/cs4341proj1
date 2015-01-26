@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="/home/andrew/Google Drive/WPI/CS 4341/Player.jar"/>
+    <jar path="C:/Users/Andrew/Google Drive/WPI/CS 4341/RoskuskiPorellPlayer.jar"/>
     <options buildIfNeeded="true" compress="false" descriptionLocation="/cs4341proj1/Player.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -11,6 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=cs4341proj1"/>
+        <file path="/cs4341proj1/.project"/>
+        <file path="/cs4341proj1/README.md"/>
+        <javaElement handleIdentifier="=cs4341proj1/src"/>
+        <file path="/cs4341proj1/.classpath"/>
+        <file path="/cs4341proj1/.gitignore"/>
+        <file path="/cs4341proj1/Player.jardesc"/>
     </selectedElements>
 </jardesc>
