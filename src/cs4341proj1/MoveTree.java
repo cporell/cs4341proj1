@@ -47,7 +47,7 @@ public class MoveTree extends GameBoard {
 	 * It assigns a points value based on the current state of the board.
 	 * This points value will eventually be assigned to this MoveTree's moveValue.
 	 */
-	public int evalMove(){
+	private int evalMove(int currentDepth){
 		int N = Config.getInstance().getNumWin();	// Grab the 'N' we have to connect
 		//int player1Points = 0;		// The amount of points the player's pieces give
 		//int player2Points = 0;		// The amount of points the opponent's pieces give
@@ -61,14 +61,17 @@ public class MoveTree extends GameBoard {
 			// so we want to give it just above our lowest value.
 			// Make the 'draw' state just above the 'lose' state,
 			// so it doesn't pick losing over drawing
-			return Integer.MIN_VALUE + 2;
+			//Logger.getInstance().print("tie");
+			return Integer.MIN_VALUE + 2 + currentDepth;
 			
 		} else if (winning){
 			// If this is a winning move, we want to set the points value to our highest value.
-			return Integer.MAX_VALUE - 1;
+			//Logger.getInstance().print("winning");
+			return Integer.MAX_VALUE - 1 - currentDepth;
 		} else if (losing) {
 			// This is a losing move, so return the least desirable score. 
-			return Integer.MIN_VALUE + 1;
+			//Logger.getInstance().print("loss");
+			return Integer.MIN_VALUE + 1 + currentDepth;
 		} else {
 			// If the proposed move doesn't reach a terminal state, search the board to score this move.
 			return scanBoard();
@@ -155,7 +158,8 @@ public class MoveTree extends GameBoard {
 	// If we find pieces of a similar player, we add to the chain.
 	private int analyzeHorizontal(int row, int col, ArrayList<Coords> visited){
 		int connected = 1;
-		boolean open = false;
+		boolean openleft = false;
+		boolean openright = false;
 		// If we've already visited this spot, back out.
 		if (visited.contains(new Coords(row, col))){
 			return 0;
@@ -169,7 +173,7 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row, i));
 			} else if(rowsCols[row][i] == (byte)0){
-				open = true;
+				openright = true;
 				break;
 			} else {
 				break;
@@ -182,7 +186,7 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row, i));
 			} else if(rowsCols[row][i] == (byte)0){
-				open = true;
+				openleft = true;
 				break;
 			} else {
 				break;
@@ -190,8 +194,12 @@ public class MoveTree extends GameBoard {
 		}
 		
 		// If the chain is open, return the number of pieces connected, else it is blocked, so no score.
-		if(open){
-			return connected;
+		if(openleft || openright){
+			if (openleft && openright){
+				return connected * 2;
+			} else {
+				return connected;
+			}
 		} else {
 			return 0;
 		}
@@ -203,7 +211,8 @@ public class MoveTree extends GameBoard {
 	private int analyzeUpDiag(int row, int col, ArrayList<Coords> visited){
 		// Base chain size of 1 for starting piece
 		int connected = 1;
-		boolean open = false;
+		boolean openleft = false;
+		boolean openright = false;
 		// If we've already visited this spot, back out.
 		if (visited.contains(new Coords(row, col))){
 			return 0;
@@ -216,7 +225,7 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row + i, col - i));
 			} else if(rowsCols[row + i][col - i] == (byte)0){
-				open = true;
+				openleft = true;
 				break;
 			} else {
 				break;
@@ -228,7 +237,7 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row - i, col + i));
 			} else if(rowsCols[row - i][col + i] == (byte)0){
-				open = true;
+				openright = true;
 				break;
 			} else {
 				break;
@@ -236,8 +245,12 @@ public class MoveTree extends GameBoard {
 		}
 		// If a piece can be dropped into place to continue the chain, return the number connected.
 		// Else it is blocked, so no score.
-		if(open){
-			return connected;
+		if(openleft || openright){
+			if (openleft && openright){
+				return connected * 2;
+			} else {
+				return connected;
+			}
 		} else {
 			return 0;
 		}
@@ -249,7 +262,8 @@ public class MoveTree extends GameBoard {
 	private int analyzeDownDiag(int row, int col, ArrayList<Coords> visited){
 		// Initial chain size of 1. You know the drill by now :)
 		int connected = 1;
-		boolean open = false;
+		boolean openleft = false;
+		boolean openright = false;
 		// If the given coord is in our "visited" list, skip it.
 		if (visited.contains(new Coords(row, col))){
 			return 0;
@@ -263,7 +277,7 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row - i, col - i));
 			} else if(rowsCols[row - i][col - i] == (byte)0){
-				open = true;
+				openleft = true;
 				break;
 			} else {
 				break;
@@ -275,44 +289,22 @@ public class MoveTree extends GameBoard {
 				connected++;
 				visited.add(new Coords(row + i, col + i));
 			} else if(rowsCols[row + i][col + i] == (byte)0){
-				open = true;
+				openright = true;
 				break;
 			} else {
 				break;
 			}
 		}
 		// If the chain is open, return the number of pieces connected. Else, score = 0.
-		if(open){
-			return connected;
+		if(openleft || openright){
+			if (openleft && openright){
+				return connected * 2;
+			} else {
+				return connected;
+			}
 		} else {
 			return 0;
 		}
-	}
-	
-	/**
-	 * Judges the preliminary score given by isNConnected.
-	 * Awards a certain amount of points based on the number given, and the number of pieces needed to win.
-	 * Shorter chains get fewer points. 
-	 */
-	public int judgePrelimScore(int prelimScore) {
-		int score = 0;
-		int NtoWin = Config.getInstance().getNumWin();
-		if(prelimScore == NtoWin) {
-			score = 10 * NtoWin;
-		}
-		else if(prelimScore == NtoWin - 1) {
-			score = 10 * (NtoWin - 1);
-		}
-		else if(prelimScore == NtoWin - 2) {
-			score = 10 * (NtoWin - 2);
-		}
-		else if(prelimScore <= NtoWin - 3) {
-			score = 10 * (NtoWin - prelimScore);
-		}
-		else {
-			score = 0;
-		}
-		return score;
 	}
 	
 	// Passes a column as a default argument to isNConnected.
@@ -425,7 +417,7 @@ public class MoveTree extends GameBoard {
 	 * @param A series of values
 	 * @return The maximum number of those values
 	 */
-	public int getMaxConnected(int... values) {
+	private int getMaxConnected(int... values) {
 		int max = Integer.MIN_VALUE;
 		for(int i : values) {
 			if(i > max) {
@@ -442,7 +434,7 @@ public class MoveTree extends GameBoard {
 	 * If this is a leaf move (has no child nodes), return the value for this leaf
 	 * Else, returns the move with the lowest value among its children leaves 
 	 */
-	public int minimax(int depth, int alpha, int beta) {
+	public int minimax(int depth, int alpha, int beta, int currentdepth) {
 		boolean allMovesInvalid = true;
 		// Stores the value of the move with the lowest value
 		int currentVal;
@@ -458,7 +450,7 @@ public class MoveTree extends GameBoard {
 		//miniVal[1] = this.moveType;		// Store the move type that will be used
 		int N = Config.getInstance().getNumWin();
 		if (depth == 0 || (this.isNConnected((byte)1, N) == N || this.isNConnected((byte)2, N) == N)){
-			return this.evalMove();
+			return this.evalMove(currentdepth);
 		}
 		
 		// If we got here, then this leaf has children.
@@ -477,8 +469,10 @@ public class MoveTree extends GameBoard {
 				}
 				
 				if (currentMove.isvalid){
+					//Logger.getInstance().print(currentMove.toString());
 					allMovesInvalid = false;
-					int childVal = currentMove.minimax(depth - 1, alpha, beta);
+					int childVal = currentMove.minimax(depth - 1, alpha, beta, currentdepth + 1);
+					//Logger.getInstance().print("prelim minimax " + j + "," + i + ":" + childVal);
 					if (this.player == 1){
 						currentVal = Math.min(childVal, currentVal);
 						beta = Math.min(beta, currentVal);
@@ -486,7 +480,8 @@ public class MoveTree extends GameBoard {
 						currentVal = Math.max(childVal, currentVal);
 						alpha = Math.max(alpha, currentVal);
 					}
-					if(beta <= alpha){
+
+					if(beta < alpha){
 						//prune(i);
 						return currentVal;
 					}

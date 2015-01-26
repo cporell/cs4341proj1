@@ -130,10 +130,12 @@ public class GameBoard {
 				currentMove = null;
 				currentMove = new MoveTree(this, 1, j, i); // Creates a new child node with the
 															// current game state, player#, move type, and col
+				
 				if(this.isMoveValid(1, j, i)){
+					//Logger.getInstance().print(currentMove.toString());
 					// If the move is valid, proceed with minimax
 					amovewasvalid = true;
-					int tempminimax = currentMove.minimax(depth - 1, maxValue, minValue);
+					int tempminimax = currentMove.minimax(depth - 1, maxValue, Integer.MAX_VALUE, 0);
 					// Timeout handler. If the time limit is reached before minimax finishes, then back out.
 					if (Thread.currentThread().isInterrupted()){
 						return;
