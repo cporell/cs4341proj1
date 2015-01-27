@@ -1,5 +1,7 @@
 package cs4341proj1;
-
+// CS 4341 Project 1
+// Andrew Roskuski
+// Connor Porell
 
 // Config class to store the initial configuration of the game board.
 // It is set when the game is created. Future events can request the game

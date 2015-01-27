@@ -1,4 +1,7 @@
 package cs4341proj1;
+//CS 4341 Project 1
+//Andrew Roskuski
+//Connor Porell
 
 // Simple class to hold a set of coords.
 // Holds a row # and a column #.

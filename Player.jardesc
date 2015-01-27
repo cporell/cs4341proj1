@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="/home/andrew/Google Drive/WPI/CS 4341/Player.jar"/>
+    <jar path="F:/14-15/C15/CS 4341/Project 1 - Games/RoskuskiPorellPlayer.jar"/>
     <options buildIfNeeded="true" compress="false" descriptionLocation="/cs4341proj1/Player.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

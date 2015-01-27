@@ -1,4 +1,7 @@
 package cs4341proj1;
+//CS 4341 Project 1
+//Andrew Roskuski
+//Connor Porell
 
 import java.util.Arrays;
 import java.util.Random;
