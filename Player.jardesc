@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="F:/14-15/C15/CS 4341/Project 1 - Games/RoskuskiPorellPlayer.jar"/>
@@ -14,3 +15,26 @@
         <javaElement handleIdentifier="=cs4341proj1"/>
     </selectedElements>
 </jardesc>
+=======
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="C:/Users/Andrew/Google Drive/WPI/CS 4341/RoskuskiPorellPlayer.jar"/>
+    <options buildIfNeeded="true" compress="false" descriptionLocation="/cs4341proj1/Player.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" mainClassHandleIdentifier="=cs4341proj1/src&lt;cs4341proj1{Player.java[Player" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/cs4341proj1/.project"/>
+        <file path="/cs4341proj1/README.md"/>
+        <javaElement handleIdentifier="=cs4341proj1/src"/>
+        <file path="/cs4341proj1/.classpath"/>
+        <file path="/cs4341proj1/.gitignore"/>
+        <file path="/cs4341proj1/Player.jardesc"/>
+    </selectedElements>
+</jardesc>
+
